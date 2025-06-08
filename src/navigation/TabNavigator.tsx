@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AlpoScreen } from '../screens/AlpoScreen';
 import { UutisetScreen } from '../screens/UutisetScreen';
 import { AsetuksetScreen } from '../screens/AsetuksetScreen';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -13,6 +14,8 @@ interface TabNavigatorProps {
 }
 
 export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) => {
+  const { isDarkMode } = useContext(ThemeContext);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -31,12 +34,12 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: isDarkMode ? '#0A84FF' : '#007AFF',
+        tabBarInactiveTintColor: isDarkMode ? '#8E8E93' : 'gray',
         headerStyle: {
-          backgroundColor: '#007AFF',
+          backgroundColor: isDarkMode ? '#121212' : '#007AFF',
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: isDarkMode ? '#FFFFFF' : '#FFFFFF',
         headerTitleStyle: {
           fontWeight: 'bold',
         },

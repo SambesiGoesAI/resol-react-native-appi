@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { authService } from '../services/auth';
+import { ThemeContext } from '../context/ThemeContext';
 
 interface AsetuksetScreenProps {
   user: any;
@@ -8,7 +9,7 @@ interface AsetuksetScreenProps {
 }
 
 export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout }) => {
-  const [darkMode, setDarkMode] = React.useState(false);
+  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [notifications, setNotifications] = React.useState(true);
   const [analytics, setAnalytics] = React.useState(false);
 
@@ -34,37 +35,37 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, isDarkMode ? styles.containerDark : null]}>
       <View style={styles.content}>
-        <Text style={styles.title}>Asetukset</Text>
+        <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Asetukset</Text>
         
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>User Information</Text>
+        <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
+          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>User Information</Text>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Email:</Text>
-            <Text style={styles.infoValue}>{user?.email || 'Not available'}</Text>
+            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Email:</Text>
+            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.email || 'Not available'}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Role:</Text>
-            <Text style={styles.infoValue}>{user?.role || 'Unknown'}</Text>
+            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Role:</Text>
+            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.role || 'Unknown'}</Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+        <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
+          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Preferences</Text>
           
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Dark Mode</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Dark Mode</Text>
             <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
+              value={isDarkMode}
+              onValueChange={toggleDarkMode}
               trackColor={{ false: '#767577', true: '#007AFF' }}
-              thumbColor={darkMode ? '#FFFFFF' : '#f4f3f4'}
+              thumbColor={isDarkMode ? '#FFFFFF' : '#f4f3f4'}
             />
           </View>
           
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Notifications</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Notifications</Text>
             <Switch
               value={notifications}
               onValueChange={setNotifications}
@@ -74,7 +75,7 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           </View>
           
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Analytics</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Analytics</Text>
             <Switch
               value={analytics}
               onValueChange={setAnalytics}
@@ -97,6 +98,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+  containerDark: {
+    backgroundColor: '#121212',
+  },
   content: {
     padding: 20,
   },
@@ -105,6 +109,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 30,
+  },
+  titleDark: {
+    color: '#FFFFFF',
   },
   section: {
     backgroundColor: '#FFFFFF',
@@ -120,11 +127,17 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  sectionDark: {
+    backgroundColor: '#1E1E1E',
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: '#333333',
     marginBottom: 15,
+  },
+  sectionTitleDark: {
+    color: '#FFFFFF',
   },
   infoRow: {
     flexDirection: 'row',
@@ -135,10 +148,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
   },
+  infoLabelDark: {
+    color: '#BBBBBB',
+  },
   infoValue: {
     fontSize: 16,
     color: '#333333',
     fontWeight: '500',
+  },
+  infoValueDark: {
+    color: '#FFFFFF',
   },
   settingRow: {
     flexDirection: 'row',
@@ -151,6 +170,9 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     color: '#333333',
+  },
+  settingLabelDark: {
+    color: '#FFFFFF',
   },
   logoutButton: {
     backgroundColor: '#FF3B30',

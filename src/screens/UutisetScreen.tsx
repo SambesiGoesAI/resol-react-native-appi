@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { ThemeContext } from '../context/ThemeContext';
 
 interface NewsItem {
   id: string;
@@ -30,17 +31,19 @@ const mockNews: NewsItem[] = [
 ];
 
 export const UutisetScreen: React.FC = () => {
+  const { isDarkMode } = useContext(ThemeContext);
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, isDarkMode ? styles.containerDark : null]}>
       <View style={styles.content}>
-        <Text style={styles.title}>Uutiset</Text>
-        <Text style={styles.subtitle}>Latest news and updates</Text>
+        <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Uutiset</Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Latest news and updates</Text>
         
         {mockNews.map((item) => (
-          <TouchableOpacity key={item.id} style={styles.newsItem}>
-            <Text style={styles.newsTitle}>{item.title}</Text>
-            <Text style={styles.newsSummary}>{item.summary}</Text>
-            <Text style={styles.newsDate}>{item.date}</Text>
+          <TouchableOpacity key={item.id} style={[styles.newsItem, isDarkMode ? styles.newsItemDark : null]}>
+            <Text style={[styles.newsTitle, isDarkMode ? styles.newsTitleDark : null]}>{item.title}</Text>
+            <Text style={[styles.newsSummary, isDarkMode ? styles.newsSummaryDark : null]}>{item.summary}</Text>
+            <Text style={[styles.newsDate, isDarkMode ? styles.newsDateDark : null]}>{item.date}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -53,6 +56,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+  containerDark: {
+    backgroundColor: '#121212',
+  },
   content: {
     padding: 20,
   },
@@ -62,10 +68,16 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 10,
   },
+  titleDark: {
+    color: '#FFFFFF',
+  },
   subtitle: {
     fontSize: 18,
     color: '#666666',
     marginBottom: 30,
+  },
+  subtitleDark: {
+    color: '#CCCCCC',
   },
   newsItem: {
     backgroundColor: '#FFFFFF',
@@ -81,11 +93,17 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  newsItemDark: {
+    backgroundColor: '#1E1E1E',
+  },
   newsTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333333',
     marginBottom: 8,
+  },
+  newsTitleDark: {
+    color: '#FFFFFF',
   },
   newsSummary: {
     fontSize: 16,
@@ -93,8 +111,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 22,
   },
+  newsSummaryDark: {
+    color: '#CCCCCC',
+  },
   newsDate: {
     fontSize: 14,
     color: '#999999',
+  },
+  newsDateDark: {
+    color: '#AAAAAA',
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { authService } from '../services/auth';
+import { ThemeContext } from '../context/ThemeContext';
 
 interface LockScreenProps {
   onLoginSuccess: (user: any) => void;
@@ -19,6 +20,7 @@ interface LockScreenProps {
 export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
   const [accessCode, setAccessCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { isDarkMode } = useContext(ThemeContext);
 
   const handleLogin = async () => {
     if (!accessCode.trim()) {
@@ -44,16 +46,17 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container}
+      style={[styles.container, isDarkMode ? styles.containerDark : null]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Welcome to Alpo</Text>
-        <Text style={styles.subtitle}>Enter your access code to continue</Text>
+        <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Welcome to Alpo</Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Enter your access code to continue</Text>
         
         <TextInput
-          style={styles.input}
+          style={[styles.input, isDarkMode ? styles.inputDark : null]}
           placeholder="Access Code"
+          placeholderTextColor={isDarkMode ? '#AAAAAA' : '#999999'}
           value={accessCode}
           onChangeText={setAccessCode}
           secureTextEntry
@@ -63,14 +66,14 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
         />
         
         <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled]}
+          style={[styles.button, isLoading && styles.buttonDisabled, isDarkMode ? styles.buttonDark : null]}
           onPress={handleLogin}
           disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={[styles.buttonText, isDarkMode ? styles.buttonTextDark : null]}>Login</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -82,6 +85,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+  },
+  containerDark: {
+    backgroundColor: '#121212',
   },
   content: {
     flex: 1,
@@ -95,11 +101,17 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 10,
   },
+  titleDark: {
+    color: '#FFFFFF',
+  },
   subtitle: {
     fontSize: 16,
     color: '#666666',
     marginBottom: 40,
     textAlign: 'center',
+  },
+  subtitleDark: {
+    color: '#CCCCCC',
   },
   input: {
     width: '100%',
@@ -111,6 +123,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     marginBottom: 20,
+    color: '#000000',
+  },
+  inputDark: {
+    backgroundColor: '#1E1E1E',
+    borderColor: '#444444',
+    color: '#FFFFFF',
   },
   button: {
     width: '100%',
@@ -120,6 +138,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  buttonDark: {
+    backgroundColor: '#0A84FF',
+  },
   buttonDisabled: {
     opacity: 0.6,
   },
@@ -127,5 +148,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+  },
+  buttonTextDark: {
+    color: '#FFFFFF',
   },
 });
