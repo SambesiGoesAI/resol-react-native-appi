@@ -74,9 +74,13 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await AsyncStorage.removeItem('user');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      // Silent fail
+    }
   };
 
   if (isLoading) {
@@ -86,7 +90,7 @@ export default function App() {
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer key={isAuthenticated ? 'auth' : 'noauth'}>
           {isAuthenticated ? (
             <TabNavigator user={user} onLogout={handleLogout} />
           ) : (

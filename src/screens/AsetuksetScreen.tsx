@@ -14,24 +14,63 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
   const [analytics, setAnalytics] = React.useState(false);
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            await authService.signOut();
-            onLogout();
-          },
-        },
-      ],
-    );
+    try {
+      // For mobile platforms, try Alert but with a timeout fallback
+      let alertShown = false;
+      
+      // Set a timeout to proceed with logout if Alert doesn't work
+      const timeoutId = setTimeout(async () => {
+        if (!alertShown) {
+          await performLogout();
+        }
+      }, 100);
+      
+      try {
+        Alert.alert(
+          'Logout',
+          'Are you sure you want to logout?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+              onPress: () => {
+                alertShown = true;
+                clearTimeout(timeoutId);
+              },
+            },
+            {
+              text: 'Logout',
+              style: 'destructive',
+              onPress: async () => {
+                alertShown = true;
+                clearTimeout(timeoutId);
+                await performLogout();
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      } catch (alertError) {
+        clearTimeout(timeoutId);
+        await performLogout();
+      }
+    } catch (error) {
+      // Silent fail
+    }
+  };
+  
+  const performLogout = async () => {
+    try {
+      const result = await authService.signOut();
+      
+      if (result?.error) {
+        return;
+      }
+      
+      await onLogout();
+    } catch (error) {
+      // Silent fail
+    }
   };
 
   return (
@@ -85,7 +124,10 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
