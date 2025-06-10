@@ -24,7 +24,15 @@ const imageMap: { [key: string]: any } = {
 export const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
   const [imageError, setImageError] = useState(false);
 
-  const imageSource = news.imagePath && imageMap[news.imagePath] && !imageError ? imageMap[news.imagePath] : null;
+  // Determine if imagePath is a remote URL or local asset key
+  let imageSource = null;
+  if (news.imagePath && !imageError) {
+    if (news.imagePath.startsWith('http://') || news.imagePath.startsWith('https://')) {
+      imageSource = { uri: news.imagePath };
+    } else if (imageMap[news.imagePath]) {
+      imageSource = imageMap[news.imagePath];
+    }
+  }
 
   return (
     <View style={styles.card}>
