@@ -117,32 +117,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   }, [chatState.messages, handleSendMessage]);
 
   const handleClearChat = useCallback(() => {
-    Alert.alert(
-      'Tyhjennä keskustelu',
-      'Haluatko varmasti tyhjentää koko keskustelun? Tätä toimintoa ei voi peruuttaa.',
-      [
-        {
-          text: 'Peruuta',
-          style: 'cancel',
-        },
-        {
-          text: 'Tyhjennä',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await chatService.clearUserData();
-              setChatState({
-                messages: [],
-                isLoading: false,
-                error: null,
-              });
-            } catch (error) {
-              console.error('Failed to clear chat:', error);
-            }
-          },
-        },
-      ]
-    );
+    // Removed clear chat functionality
   }, []);
 
   return (
@@ -156,7 +131,6 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
         isLoading={chatState.isLoading}
         error={chatState.error}
         onRetry={handleRetry}
-        onClearChat={handleClearChat}
       />
       <ChatInput
         onSendMessage={handleSendMessage}

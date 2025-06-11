@@ -9,15 +9,13 @@ interface ChatContainerProps {
   isLoading: boolean;
   error: string | null;
   onRetry?: () => void;
-  onClearChat?: () => void;
 }
 
-export const ChatContainer: React.FC<ChatContainerProps> = ({ 
-  messages, 
-  isLoading, 
-  error, 
+export const ChatContainer: React.FC<ChatContainerProps> = ({
+  messages,
+  isLoading,
+  error,
   onRetry,
-  onClearChat 
 }) => {
   const { isDarkMode } = useContext(ThemeContext);
   const flatListRef = useRef<FlatList>(null);
@@ -94,37 +92,11 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     </View>
   );
 
-  const renderHeader = () => {
-    if (messages.length === 0) return null;
-    
-    return (
-      <View style={styles.headerContainer}>
-        {onClearChat && (
-          <TouchableOpacity
-            style={[
-              styles.clearButton,
-              isDarkMode ? styles.clearButtonDark : null
-            ]}
-            onPress={onClearChat}
-          >
-            <Text style={[
-              styles.clearButtonText,
-              isDarkMode ? styles.clearButtonTextDark : null
-            ]}>
-              Tyhjennä keskustelu
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  };
-
   return (
     <View style={[
       styles.container,
       isDarkMode ? styles.containerDark : null
     ]}>
-      {renderHeader()}
       <FlatList
         ref={flatListRef}
         data={messages}

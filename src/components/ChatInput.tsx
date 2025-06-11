@@ -1,20 +1,21 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
-
+import './ChatInputFocusOverride.css';
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ 
-  onSendMessage, 
-  isLoading, 
-  disabled = false 
+export const ChatInput: React.FC<ChatInputProps> = ({
+  onSendMessage,
+  isLoading,
+  disabled = false
 }) => {
   const { isDarkMode } = useContext(ThemeContext);
   const [message, setMessage] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
@@ -33,12 +34,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     ]}>
       <View style={[
         styles.inputContainer,
-        isDarkMode ? styles.inputContainerDark : null
+        isDarkMode ? styles.inputContainerDark : null,
+        isFocused ? styles.inputContainerFocused : null
       ]}>
         <TextInput
           style={[
             styles.textInput,
-            isDarkMode ? styles.textInputDark : null
+            isDarkMode ? styles.textInputDark : null,
+            message.length > 0 ? styles.textInputFocused : null
           ]}
           value={message}
           onChangeText={setMessage}
@@ -49,6 +52,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           editable={!isLoading && !disabled}
           onSubmitEditing={handleSend}
           blurOnSubmit={false}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className="chat-input-no-outline"
         />
         <TouchableOpacity
           style={[
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: '#F2F2F7',
     borderRadius: 20,
     paddingHorizontal: 16,
@@ -111,6 +117,8 @@ const styles = StyleSheet.create({
     color: '#000000',
     maxHeight: 100,
     paddingVertical: 8,
+    borderWidth: 0,
+    borderColor: 'transparent',
   },
   textInputDark: {
     color: '#FFFFFF',
@@ -151,5 +159,12 @@ const styles = StyleSheet.create({
   },
   sendButtonTextInactiveDark: {
     color: '#666666',
+  },
+  textInputFocused: {
+    borderColor: '#000000', // dark gray color for focus frame
+  },
+  inputContainerFocused: {
+    borderColor: '#555555', // dark gray color for focus frame
+    borderWidth: 1,
   },
 });
