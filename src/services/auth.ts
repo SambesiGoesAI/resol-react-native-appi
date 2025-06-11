@@ -17,7 +17,6 @@ export const authService = {
     }
 
     try {
-      console.log('Auth: Attempting to fetch user with access code:', accessCode);
       // First, query the users table
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -26,7 +25,6 @@ export const authService = {
         .single();
 
       if (userError || !userData) {
-        console.log('Auth: User fetch error or no data:', userError);
         return { user: null, error: 'Invalid access code' };
       }
 
@@ -37,14 +35,12 @@ export const authService = {
         .eq('user_id', userData.id);
 
       if (housingError) {
-        console.log('Auth: Housing companies fetch error:', housingError);
+        // Silent fail - housing companies fetch error
       }
 
       const housingCompanyIds = housingCompaniesData?.map(
         (uhc: any) => uhc.housing_company_id
       ) || [];
-
-      console.log('Auth: Fetched user data:', { id: userData.id, email: userData.email, housingCompanyIds });
 
       // Return the user data directly without attempting Supabase auth
       // This app uses custom access code authentication, not Supabase auth
@@ -59,7 +55,6 @@ export const authService = {
         error: null
       };
     } catch (error) {
-      console.log('Auth: Exception during signInWithAccessCode:', error);
       return { user: null, error: 'Authentication failed' };
     }
   },

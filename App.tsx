@@ -5,13 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { LockScreen } from './src/screens/LockScreen';
 import { TabNavigator } from './src/navigation/TabNavigator';
-import { authService } from './src/services/auth';
+import { authService, User } from './src/services/auth';
 import { ThemeContext } from './src/context/ThemeContext';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -37,7 +37,7 @@ export default function App() {
         }
       }
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      // Silent fail - auth check error
     }
   };
 
@@ -48,7 +48,7 @@ export default function App() {
         setIsDarkMode(storedPreference === 'true');
       }
     } catch (error) {
-      console.error('Error loading dark mode preference:', error);
+      // Silent fail - dark mode preference error
     }
   };
 
@@ -58,7 +58,7 @@ export default function App() {
       setIsDarkMode(newValue);
       await AsyncStorage.setItem('darkMode', newValue.toString());
     } catch (error) {
-      console.error('Error saving dark mode preference:', error);
+      // Silent fail - dark mode save error
     }
   };
 
@@ -66,7 +66,7 @@ export default function App() {
     setIsLoading(false);
   };
 
-  const handleLoginSuccess = async (userData: any) => {
+  const handleLoginSuccess = async (userData: User) => {
     // Store user data in AsyncStorage for persistence
     await AsyncStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);

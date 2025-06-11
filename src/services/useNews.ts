@@ -102,7 +102,6 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
         setSyncStatus('idle');
       },
       onError: (syncError) => {
-        console.error('Background sync error:', syncError);
         setSyncStatus('error');
         // Fallback to mock data on error
         if (news.length === 0) {
@@ -149,7 +148,6 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
     setError(null);
 
     try {
-      console.log('useNews: Loading news for user:', user);
       let fetchedNews: NewsItem[];
       
       if (user?.housing_companies && user.housing_companies.length > 0) {
@@ -157,12 +155,10 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
         fetchedNews = await newsServiceRef.current!.fetchNewsForHousingCompanies(
           user.housing_companies
         );
-        console.log('useNews: Fetched news count:', fetchedNews.length);
       } else {
         // No housing companies = no news
         fetchedNews = [];
         setError('No housing companies assigned to your account');
-        console.log('useNews: No housing companies assigned to user');
       }
 
       newsServiceRef.current!.updateCache(fetchedNews);
@@ -170,7 +166,6 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
       setLastSyncTime(new Date());
       setSyncStatus('idle');
     } catch (loadError) {
-      console.error('Failed to load news:', loadError);
       setError((loadError as Error).message);
       setSyncStatus('error');
       

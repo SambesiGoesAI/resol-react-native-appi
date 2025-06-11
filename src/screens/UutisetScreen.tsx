@@ -19,7 +19,7 @@ export const UutisetScreen: React.FC = () => {
           setUser(JSON.parse(userData));
         }
       } catch (error) {
-        console.error('Failed to load user:', error);
+        // Silent fail - user load error
       } finally {
         setUserLoading(false);
       }

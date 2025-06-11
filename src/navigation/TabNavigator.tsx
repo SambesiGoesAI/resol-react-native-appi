@@ -5,11 +5,12 @@ import { AlpoScreen } from '../screens/AlpoScreen';
 import { UutisetScreen } from '../screens/UutisetScreen';
 import { AsetuksetScreen } from '../screens/AsetuksetScreen';
 import { ThemeContext } from '../context/ThemeContext';
+import { User } from '../services/auth';
 
 const Tab = createBottomTabNavigator();
 
 interface TabNavigatorProps {
-  user: any;
+  user: User | null;
   onLogout: () => void;
 }
 

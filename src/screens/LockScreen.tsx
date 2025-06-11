@@ -10,11 +10,11 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { authService } from '../services/auth';
+import { authService, User } from '../services/auth';
 import { ThemeContext } from '../context/ThemeContext';
 
 interface LockScreenProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: User) => void;
 }
 
 export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {

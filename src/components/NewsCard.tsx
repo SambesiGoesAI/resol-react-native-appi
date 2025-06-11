@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, LayoutChangeEvent } from 'react-native';
-
-interface NewsItem {
-  id: string;
-  title: string;
-  text: string;
-  imagePath?: string;
-}
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { NewsItem } from '../services/useNews';
 
 interface NewsCardProps {
   news: NewsItem;
@@ -26,11 +20,12 @@ export const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
 
   // Determine if imagePath is a remote URL or local asset key
   let imageSource = null;
-  if (news.imagePath && !imageError) {
-    if (news.imagePath.startsWith('http://') || news.imagePath.startsWith('https://')) {
-      imageSource = { uri: news.imagePath };
-    } else if (imageMap[news.imagePath]) {
-      imageSource = imageMap[news.imagePath];
+  const imageUrl = news.image_url || news.imagePath;
+  if (imageUrl && !imageError) {
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      imageSource = { uri: imageUrl };
+    } else if (imageMap[imageUrl]) {
+      imageSource = imageMap[imageUrl];
     }
   }
 

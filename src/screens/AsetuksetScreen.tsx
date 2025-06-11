@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { authService } from '../services/auth';
+import { authService, User } from '../services/auth';
 import { ThemeContext } from '../context/ThemeContext';
 
 interface AsetuksetScreenProps {
-  user: any;
+  user: User | null;
   onLogout: () => void;
 }
 

@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
+import { User } from '../services/auth';
 
 interface AlpoScreenProps {
-  user: any;
+  user: User | null;
 }
 
 export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
