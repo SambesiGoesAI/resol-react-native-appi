@@ -21,10 +21,15 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
   const [accessCode, setAccessCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { isDarkMode } = useContext(ThemeContext);
+  const inputRef = React.useRef<TextInput>(null);
+
+  React.useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleLogin = async () => {
     if (!accessCode.trim()) {
-      Alert.alert('Error', 'Please enter an access code');
+      Alert.alert('Virhe', 'Syötä pääsykoodi');
       return;
     }
 
@@ -33,12 +38,12 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
       const { user, error } = await authService.signInWithAccessCode(accessCode);
       
       if (error || !user) {
-        Alert.alert('Login Failed', error || 'Invalid access code');
+        Alert.alert('Kirjautuminen epäonnistui', error || 'Virheellinen pääsykoodi');
       } else {
         onLoginSuccess(user);
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Virhe', 'Odottamaton virhe tapahtui');
     } finally {
       setIsLoading(false);
     }
@@ -50,12 +55,12 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Welcome to Alpo</Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Enter your access code to continue</Text>
+        <Text style={[styles.title, styles.titleCentered, isDarkMode ? styles.titleDark : null]}>Tervetuloa Alpo-sovellukseen!</Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Syötä pääsykoodisi ja paina 'Kirjaudu'</Text>
         
         <TextInput
           style={[styles.input, isDarkMode ? styles.inputDark : null]}
-          placeholder="Access Code"
+          placeholder="Pääsykoodi"
           placeholderTextColor={isDarkMode ? '#AAAAAA' : '#999999'}
           value={accessCode}
           onChangeText={setAccessCode}
@@ -63,6 +68,9 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
           autoCapitalize="none"
           autoCorrect={false}
           editable={!isLoading}
+          onSubmitEditing={handleLogin}
+          returnKeyType="done"
+          ref={inputRef}
         />
         
         <TouchableOpacity 
@@ -73,7 +81,7 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
           {isLoading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={[styles.buttonText, isDarkMode ? styles.buttonTextDark : null]}>Login</Text>
+            <Text style={[styles.buttonText, isDarkMode ? styles.buttonTextDark : null]}>Kirjaudu</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -151,5 +159,8 @@ const styles = StyleSheet.create({
   },
   buttonTextDark: {
     color: '#FFFFFF',
+  },
+  titleCentered: {
+    textAlign: 'center',
   },
 });

@@ -13,14 +13,13 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     <ScrollView style={[styles.container, isDarkMode ? styles.containerDark : null]}>
       <View style={styles.content}>
         <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Alpo</Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Welcome, {user?.email || 'User'}</Text>
-        <Text style={[styles.roleText, isDarkMode ? styles.roleTextDark : null]}>Role: {user?.role || 'Unknown'}</Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Tervetuloa, {user?.email || 'Käyttäjä'}</Text>
+        <Text style={[styles.roleText, isDarkMode ? styles.roleTextDark : null]}>Rooli: {user?.role || 'Tuntematon'}</Text>
         
         <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
-          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Main Content Area</Text>
+          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Pääsisältöalue</Text>
           <Text style={[styles.sectionText, isDarkMode ? styles.sectionTextDark : null]}>
-            This is the primary content area for the Alpo tab. 
-            Content here will be based on user role and permissions.
+            Tämä on Alpo-välilehden pääsisältöalue. Sisältö täällä perustuu käyttäjän rooliin ja käyttöoikeuksiin.
           </Text>
         </View>
       </View>

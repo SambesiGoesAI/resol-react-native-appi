@@ -27,11 +27,11 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
       
       try {
         Alert.alert(
-          'Logout',
-          'Are you sure you want to logout?',
+          'Kirjaudu ulos',
+          'Haluatko varmasti kirjautua ulos?',
           [
             {
-              text: 'Cancel',
+              text: 'Peruuta',
               style: 'cancel',
               onPress: () => {
                 alertShown = true;
@@ -39,7 +39,7 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
               },
             },
             {
-              text: 'Logout',
+              text: 'Kirjaudu ulos',
               style: 'destructive',
               onPress: async () => {
                 alertShown = true;
@@ -79,22 +79,22 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
         <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Asetukset</Text>
         
         <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
-          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>User Information</Text>
+          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Käyttäjätiedot</Text>
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Email:</Text>
-            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.email || 'Not available'}</Text>
+            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Sähköposti:</Text>
+            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.email || 'Ei saatavilla'}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Role:</Text>
-            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.role || 'Unknown'}</Text>
+            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Rooli:</Text>
+            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.role || 'Tuntematon'}</Text>
           </View>
         </View>
 
         <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
-          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Preferences</Text>
+          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Asetukset</Text>
           
           <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Dark Mode</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Tumma tila</Text>
             <Switch
               value={isDarkMode}
               onValueChange={toggleDarkMode}
@@ -104,7 +104,7 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           </View>
           
           <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Notifications</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Ilmoitukset</Text>
             <Switch
               value={notifications}
               onValueChange={setNotifications}
@@ -114,7 +114,7 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           </View>
           
           <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Analytics</Text>
+            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Analytiikka</Text>
             <Switch
               value={analytics}
               onValueChange={setAnalytics}
@@ -128,7 +128,7 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <Text style={styles.logoutButtonText}>Kirjaudu ulos</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

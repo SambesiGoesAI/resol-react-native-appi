@@ -35,7 +35,7 @@ export const UutisetScreen: React.FC = () => {
       <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
         <ActivityIndicator size="large" color={isDarkMode ? '#FFF' : '#333'} />
         <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
-          Loading user data...
+          Ladataan käyttäjätietoja...
         </Text>
       </View>
     );
@@ -46,7 +46,7 @@ export const UutisetScreen: React.FC = () => {
       <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
         <ActivityIndicator size="large" color={isDarkMode ? '#FFF' : '#333'} />
         <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
-          Loading news...
+          Ladataan uutisia...
         </Text>
       </View>
     );
@@ -66,7 +66,7 @@ export const UutisetScreen: React.FC = () => {
     return (
       <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
         <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
-          Please log in to view news
+          Kirjaudu sisään nähdäksesi uutiset
         </Text>
       </View>
     );
@@ -77,7 +77,7 @@ export const UutisetScreen: React.FC = () => {
       {news.length === 0 ? (
         <View style={styles.centered}>
           <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
-            No news available for your housing companies
+            Taloyhtiöllesi ei ole tällä hetkellä uutisia saatavilla
           </Text>
         </View>
       ) : (
