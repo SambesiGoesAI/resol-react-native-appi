@@ -22,8 +22,11 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
 
   // Load existing messages and session on component mount
   useEffect(() => {
+    if (user) {
+      chatService.setUser(user);
+    }
     loadChatHistory();
-  }, []);
+  }, [user]);
 
   const loadChatHistory = async () => {
     try {
@@ -54,7 +57,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     setChatState(prev => {
       const newMessages = [...prev.messages, message];
       // Save messages to storage
-      chatService.saveMessages(newMessages);
+      chatService.saveMessage(newMessages[newMessages.length - 1]);
       return {
         ...prev,
         messages: newMessages,
@@ -65,7 +68,6 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   };
 
   const handleSendMessage = useCallback(async (messageText: string) => {
-    console.log('[AlpoScreen] handleSendMessage called with:', messageText);
     if (!messageText.trim() || chatState.isLoading) return;
 
     // Clear any previous errors
@@ -80,15 +82,14 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     try {
       // Send message to webhook
       const response = await chatService.sendMessage(messageText);
-      console.log('[AlpoScreen] Received response:', response);
       
       // Add agent response
       addMessage(response.agentMessage, false);
 
       // Update session ID if received
       if (response.sessionId) {
-        console.log('[AlpoScreen] Setting sessionID:', response.sessionId);
-        chatService.setSessionID(response.sessionId);
+        // Removed call to setSessionID as it does not exist in ChatService
+        // Session ID is managed internally in ChatService
       }
       setChatState(prev => ({
         ...prev,
@@ -97,7 +98,6 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Tuntematon virhe tapahtui';
-      console.error('[AlpoScreen] Error sending message:', errorMessage);
       
       setChatState(prev => ({
         ...prev,
@@ -130,7 +130,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await chatService.clearSession();
+              await chatService.clearUserData();
               setChatState({
                 messages: [],
                 isLoading: false,

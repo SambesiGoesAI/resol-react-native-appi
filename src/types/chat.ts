@@ -3,6 +3,8 @@ export interface ChatMessage {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  userId?: string; // Add user context
+  sessionId?: string; // Add session context
 }
 
 export interface WebhookRequest {
@@ -16,8 +18,12 @@ export interface WebhookResponse {
 }
 
 export interface ChatSession {
-  sessionID: string | null;
-  messages: ChatMessage[];
+  id: string;
+  userId: string;
+  webhookSessionId: string; // External webhook session ID
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean;
 }
 
 export interface ChatState {

@@ -1,93 +1,181 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { WebhookRequest, WebhookResponse, ChatMessage } from '../types/chat';
+import { supabase } from './supabase';
+import { WebhookRequest, WebhookResponse, ChatMessage, ChatSession } from '../types/chat';
+import { User } from './auth';
 
 const WEBHOOK_URL = 'https://n8n.andsome.fi/webhook/c389f93f-25da-42d1-929a-17046d85c5ad';
-const SESSION_STORAGE_KEY = 'chat_session_id';
-const MESSAGES_STORAGE_KEY = 'chat_messages';
 
 export class ChatService {
-  private sessionID: string | null = null;
+  private currentUser: User | null = null;
+  private currentSession: ChatSession | null = null;
 
-  private sessionLoadPromise: Promise<void> | null = null;
-
-  constructor() {
-    this.sessionLoadPromise = this.loadSession();
+  /**
+   * Set the current user context
+   */
+  setUser(user: User | null): void {
+    this.currentUser = user;
+    this.currentSession = null; // Reset session when user changes
   }
 
-  private async loadSession(): Promise<void> {
-    try {
-      console.log('[ChatService] Loading session from AsyncStorage');
-      const storedSessionID = await AsyncStorage.getItem(SESSION_STORAGE_KEY);
-      console.log('[ChatService] Loaded sessionID:', storedSessionID);
-      this.sessionID = storedSessionID;
-    } catch (error) {
-      console.error('Failed to load session:', error);
-    }
-  }
-
-  private async saveSession(sessionID: string): Promise<void> {
-    try {
-      console.log('[ChatService] Saving sessionID to AsyncStorage:', sessionID);
-      this.sessionID = sessionID;
-      await AsyncStorage.setItem(SESSION_STORAGE_KEY, sessionID);
-    } catch (error) {
-      console.error('Failed to save session:', error);
-    }
-  }
-
-  async saveMessages(messages: ChatMessage[]): Promise<void> {
-    try {
-      console.log('[ChatService] Saving messages to AsyncStorage:', messages.length);
-      await AsyncStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
-    } catch (error) {
-      console.error('Failed to save messages:', error);
-    }
-  }
-
-  setSessionID(sessionID: string | null) {
-    this.sessionID = sessionID;
-  }
-
+  /**
+   * Load user-specific messages from Supabase
+   */
   async loadMessages(): Promise<ChatMessage[]> {
-    try {
-      console.log('[ChatService] Loading messages from AsyncStorage');
-      const storedMessages = await AsyncStorage.getItem(MESSAGES_STORAGE_KEY);
-      if (storedMessages) {
-        const parsedMessages = JSON.parse(storedMessages);
-        console.log('[ChatService] Loaded messages count:', parsedMessages.length);
-        // Convert timestamp strings back to Date objects
-        return parsedMessages.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        }));
-      }
+    if (!this.currentUser || !supabase) {
       return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('user_id', this.currentUser.id)
+        .order('timestamp', { ascending: true });
+
+      if (error) {
+        console.error('Failed to load messages from Supabase:', error);
+        return [];
+      }
+
+      return data.map(msg => ({
+        id: msg.message_id,
+        text: msg.text,
+        isUser: msg.is_user,
+        timestamp: new Date(msg.timestamp),
+      }));
     } catch (error) {
       console.error('Failed to load messages:', error);
       return [];
     }
   }
 
-  async sendMessage(message: string): Promise<WebhookResponse> {
-    console.log('[ChatService] sendMessage called with message:', message);
-    console.log('[ChatService] Current sessionID before sending:', this.sessionID);
-
-    // Wait for session to load before sending message
-    if (this.sessionLoadPromise) {
-      await this.sessionLoadPromise;
-      this.sessionLoadPromise = null;
+  /**
+   * Save message to Supabase with user context
+   */
+  async saveMessage(message: ChatMessage): Promise<void> {
+    if (!this.currentUser || !supabase) {
+      console.warn('Cannot save message: no user context or Supabase connection');
+      return;
     }
+
+    try {
+      const { error } = await supabase
+        .from('chat_messages')
+        .insert({
+          user_id: this.currentUser.id,
+          session_id: this.currentSession?.id,
+          message_id: message.id,
+          text: message.text,
+          is_user: message.isUser,
+          timestamp: message.timestamp.toISOString()
+        });
+
+      if (error) {
+        console.error('Failed to save message to Supabase:', error);
+      }
+    } catch (error) {
+      console.error('Failed to save message:', error);
+    }
+  }
+
+  /**
+   * Get or create user-specific session
+   */
+  async getOrCreateSession(): Promise<string | null> {
+    if (!this.currentUser || !supabase) {
+      return null;
+    }
+
+    try {
+      // Try to get existing active session
+      const { data: existingSessions, error: fetchError } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('user_id', this.currentUser.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (fetchError) {
+        console.error('Failed to fetch existing sessions:', fetchError);
+        return null;
+      }
+
+      if (existingSessions && existingSessions.length > 0) {
+        this.currentSession = {
+          id: existingSessions[0].id,
+          userId: existingSessions[0].user_id,
+          webhookSessionId: existingSessions[0].webhook_session_id,
+          createdAt: new Date(existingSessions[0].created_at),
+          updatedAt: new Date(existingSessions[0].updated_at),
+          isActive: existingSessions[0].is_active
+        };
+        return existingSessions[0].webhook_session_id;
+      }
+
+      return null; // No existing session, will be created after first message
+    } catch (error) {
+      console.error('Failed to get or create session:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Save session to Supabase after receiving from webhook
+   */
+  async saveSession(webhookSessionId: string): Promise<void> {
+    if (!this.currentUser || !supabase) {
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert({
+          user_id: this.currentUser.id,
+          webhook_session_id: webhookSessionId,
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to save session to Supabase:', error);
+        return;
+      }
+
+      this.currentSession = {
+        id: data.id,
+        userId: data.user_id,
+        webhookSessionId: data.webhook_session_id,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+        isActive: data.is_active
+      };
+    } catch (error) {
+      console.error('Failed to save session:', error);
+    }
+  }
+
+  /**
+   * Send message with user context
+   */
+  async sendMessage(message: string): Promise<WebhookResponse> {
+    if (!this.currentUser) {
+      throw new Error('No user context available');
+    }
+
+    // Get existing session ID
+    const existingSessionId = await this.getOrCreateSession();
 
     const requestBody: WebhookRequest = {
       message: message.trim(),
     };
 
-    // Include sessionId if we have one (not for the first message)
-    if (this.sessionID) {
-      requestBody.sessionId = this.sessionID;
+    // Include sessionId if we have one
+    if (existingSessionId) {
+      requestBody.sessionId = existingSessionId;
     }
-
-    console.log('[ChatService] Request body:', requestBody);
 
     try {
       const response = await fetch(WEBHOOK_URL, {
@@ -104,37 +192,59 @@ export class ChatService {
 
       const data = await response.json();
 
-      console.log('[ChatService] Response data:', data);
-
       // Save session ID if this is the first message
-      if (!this.sessionID && data.sessionId) {
-        console.log('[ChatService] Saving new sessionID:', data.sessionId);
+      if (!existingSessionId && data.sessionId) {
         await this.saveSession(data.sessionId);
       }
 
       return data;
     } catch (error) {
-      console.error('Failed to send message:', error);
       throw new Error('Failed to send message. Please check your connection and try again.');
     }
   }
 
+  /**
+   * Get current session ID
+   */
   getSessionID(): string | null {
-    return this.sessionID;
+    return this.currentSession?.webhookSessionId || null;
   }
 
-  async clearSession(): Promise<void> {
-    try {
-      this.sessionID = null;
-      await AsyncStorage.removeItem(SESSION_STORAGE_KEY);
-      await AsyncStorage.removeItem(MESSAGES_STORAGE_KEY);
-    } catch (error) {
-      console.error('Failed to clear session:', error);
+  /**
+   * Clear user-specific data on logout
+   */
+  async clearUserData(): Promise<void> {
+    this.currentUser = null;
+    this.currentSession = null;
+    // Note: We don't delete data from Supabase, just clear local references
+  }
+
+  /**
+   * Clear all chat data for current user (destructive operation)
+   */
+  async clearUserChatHistory(): Promise<void> {
+    if (!this.currentUser || !supabase) {
+      return;
     }
-  }
 
-  async resetSession(): Promise<void> {
-    await this.clearSession();
+    try {
+      // Delete messages first (due to foreign key constraints)
+      await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('user_id', this.currentUser.id);
+
+      // Delete sessions
+      await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('user_id', this.currentUser.id);
+
+      this.currentSession = null;
+    } catch (error) {
+      console.error('Failed to clear user chat history:', error);
+      throw error;
+    }
   }
 }
 
