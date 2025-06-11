@@ -6,6 +6,7 @@ export interface User {
   email?: string;
   role: string;
   access_code: string;
+  housing_companies?: string[]; // Array of housing company IDs
 }
 
 export const authService = {
@@ -16,72 +17,77 @@ export const authService = {
     }
 
     try {
-      // Query the users table for a matching access code
-      const { data, error } = await supabase
+      console.log('Auth: Attempting to fetch user with access code:', accessCode);
+      // First, query the users table
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('access_code', accessCode)
         .single();
 
-      if (error || !data) {
+      if (userError || !userData) {
+        console.log('Auth: User fetch error or no data:', userError);
         return { user: null, error: 'Invalid access code' };
       }
 
-      // Create a session for the user
-      const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: accessCode, // Using access code as password for simplicity
-      });
+      // Then, query the user_housing_companies table separately
+      const { data: housingCompaniesData, error: housingError } = await supabase
+        .from('user_housing_companies')
+        .select('housing_company_id')
+        .eq('user_id', userData.id);
 
-      if (sessionError) {
-        // If standard auth fails, we'll store the user data in AsyncStorage
-        // This is a fallback for custom authentication
-        return { 
-          user: {
-            id: data.id,
-            email: data.email,
-            role: data.role,
-            access_code: data.access_code,
-          }, 
-          error: null 
-        };
+      if (housingError) {
+        console.log('Auth: Housing companies fetch error:', housingError);
       }
 
-      return { 
+      const housingCompanyIds = housingCompaniesData?.map(
+        (uhc: any) => uhc.housing_company_id
+      ) || [];
+
+      console.log('Auth: Fetched user data:', { id: userData.id, email: userData.email, housingCompanyIds });
+
+      // Return the user data directly without attempting Supabase auth
+      // This app uses custom access code authentication, not Supabase auth
+      return {
         user: {
-          id: data.id,
-          email: data.email,
-          role: data.role,
-          access_code: data.access_code,
-        }, 
-        error: null 
+          id: userData.id,
+          email: userData.email,
+          role: userData.role,
+          access_code: userData.access_code,
+          housing_companies: housingCompanyIds,
+        },
+        error: null
       };
     } catch (error) {
+      console.log('Auth: Exception during signInWithAccessCode:', error);
       return { user: null, error: 'Authentication failed' };
     }
   },
 
   async signOut() {
+    // Since we're using custom auth, just return success
+    // The actual logout is handled by clearing AsyncStorage in the app
     if (USE_MOCK_AUTH || !supabase) {
       return mockAuthService.signOut();
     }
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    return { error: null };
   },
 
   async getCurrentUser() {
+    // Since we're using custom auth, this should be handled by AsyncStorage
+    // Return null as we don't maintain a Supabase session
     if (USE_MOCK_AUTH || !supabase) {
       return mockAuthService.getCurrentUser();
     }
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    return null;
   },
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
-    if (!supabase) {
-      // Return a dummy unsubscribe function
-      return { data: null, error: null, unsubscribe: () => {} };
-    }
-    return supabase.auth.onAuthStateChange(callback);
+    // Return a dummy implementation since we're not using Supabase auth
+    return {
+      data: { subscription: null },
+      error: null,
+      unsubscribe: () => {}
+    };
   },
 };

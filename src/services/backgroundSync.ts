@@ -1,11 +1,13 @@
 import { NewsService } from './newsService';
 import { NewsItem } from './useNews';
+import { User } from './auth';
 
 export interface SyncConfig {
   interval: number; // milliseconds
   enabled: boolean;
   onUpdate?: (news: NewsItem[]) => void;
   onError?: (error: Error) => void;
+  user?: User; // Add user context
 }
 
 export class BackgroundSyncManager {
@@ -44,27 +46,55 @@ export class BackgroundSyncManager {
 
     try {
       const { lastSyncTime } = this.newsService.getCache();
-      
-      let news: NewsItem[];
+      let newNews: NewsItem[];
+
       if (lastSyncTime) {
-        // Fetch only new news since last sync
-        const newNews = await this.newsService.fetchNewsSince(lastSyncTime);
-        if (newNews.length > 0) {
-          const { news: cachedNews } = this.newsService.getCache();
-          news = [...newNews, ...cachedNews];
+        // Incremental sync with user's housing companies
+        if (this.config.user?.housing_companies && this.config.user.housing_companies.length > 0) {
+          newNews = await this.newsService.fetchNewsSince(
+            lastSyncTime,
+            this.config.user.housing_companies
+          );
         } else {
-          return; // No new news
+          newNews = [];
         }
       } else {
-        // First sync - fetch all news
-        news = await this.newsService.fetchNews();
+        // Full sync with user's housing companies
+        if (this.config.user?.housing_companies && this.config.user.housing_companies.length > 0) {
+          newNews = await this.newsService.fetchNewsForHousingCompanies(
+            this.config.user.housing_companies
+          );
+        } else {
+          newNews = [];
+        }
       }
 
-      this.newsService.updateCache(news);
-      this.config.onUpdate?.(news);
+      if (newNews.length > 0) {
+        const { news: cachedNews } = this.newsService.getCache();
+        const updatedNews = this.mergeNews(cachedNews, newNews);
+        this.newsService.updateCache(updatedNews);
+        this.config.onUpdate?.(updatedNews);
+      }
     } catch (error) {
       this.config.onError?.(error as Error);
     }
+  }
+
+  private mergeNews(cachedNews: NewsItem[], newNews: NewsItem[]): NewsItem[] {
+    // Create a map of existing news by ID for efficient lookup
+    const existingNewsMap = new Map(cachedNews.map(item => [item.id, item]));
+    
+    // Add or update news items
+    newNews.forEach(item => {
+      existingNewsMap.set(item.id, item);
+    });
+    
+    // Convert back to array and sort by created_at descending
+    return Array.from(existingNewsMap.values()).sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
   }
 
   updateConfig(newConfig: Partial<SyncConfig>): void {

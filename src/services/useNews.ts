@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { NewsService } from './newsService';
 import { BackgroundSyncManager, SyncConfig } from './backgroundSync';
+import { User } from './auth';
 
 export interface NewsItem {
   id: string;
@@ -9,12 +10,15 @@ export interface NewsItem {
   imagePath?: string;
   image_url?: string;
   created_at?: string;
+  housing_company_id: string;
+  housing_company_name?: string;
 }
 
 interface UseNewsConfig {
   useMockData?: boolean;
   syncInterval?: number; // milliseconds, default 5 minutes
   enableBackgroundSync?: boolean;
+  user?: User; // Add user context
 }
 
 interface UseNewsReturn {
@@ -30,21 +34,27 @@ interface UseNewsReturn {
 const mockNewsData: NewsItem[] = [
   {
     id: '1',
-    title: 'Uutinen 1',
+    title: 'Uutinen 1 - Keskuskatu 1',
     text: 'Tämä on lyhyt uutinen, joka mahtuu alle kolmeen riviin.',
     imagePath: '../assets/icon1.png',
+    housing_company_id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    housing_company_name: 'Keskuskatu 1'
   },
   {
     id: '2',
-    title: 'Uutinen 2',
+    title: 'Uutinen 2 - Puistotie 5',
     text: 'Tämä uutinen on hieman pidempi ja sen pitäisi katkaista kolmeen riviin, jotta "Lue lisää" -linkki tulee näkyviin. Tämä teksti jatkuu vielä hieman pidemmälle, jotta voimme testata leikkaamista.',
     imagePath: '../assets/icon2.png',
+    housing_company_id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    housing_company_name: 'Puistotie 5'
   },
   {
     id: '3',
-    title: 'Uutinen 3',
+    title: 'Uutinen 3 - Rantakatu 10',
     text: 'Tämä on todella pitkä uutinen, joka ylittää selvästi kolme riviä. Sen tarkoituksena on testata, että uutisen tekstin katkaisu ja laajennus toimivat oikein. Käyttäjä voi klikata "Lue lisää" nähdäksesi koko tekstin ja "Näytä vähemmän" piilottaakseen sen uudelleen.',
     imagePath: '../assets/icon3.png',
+    housing_company_id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+    housing_company_name: 'Rantakatu 10'
   },
 ];
 
@@ -53,6 +63,7 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
     useMockData = false,
     syncInterval = 5 * 60 * 1000, // 5 minutes
     enableBackgroundSync = true,
+    user,
   } = config;
 
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -66,8 +77,14 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
 
   useEffect(() => {
     if (useMockData) {
-      // Use mock data
-      setNews(mockNewsData);
+      // Filter mock data based on user's housing companies
+      let filteredMockData = mockNewsData;
+      if (user?.housing_companies && user.housing_companies.length > 0) {
+        filteredMockData = mockNewsData.filter(item =>
+          user.housing_companies!.includes(item.housing_company_id)
+        );
+      }
+      setNews(filteredMockData);
       setLoading(false);
       return;
     }
@@ -78,6 +95,7 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
     const syncConfig: SyncConfig = {
       interval: syncInterval,
       enabled: enableBackgroundSync,
+      user: user || undefined, // Pass user context to sync manager
       onUpdate: (updatedNews) => {
         setNews(updatedNews);
         setLastSyncTime(new Date());
@@ -110,11 +128,18 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
     return () => {
       syncManagerRef.current?.stop();
     };
-  }, [useMockData, syncInterval, enableBackgroundSync]);
+  }, [useMockData, syncInterval, enableBackgroundSync, user?.id]);
 
   const loadNews = async (): Promise<void> => {
     if (useMockData) {
-      setNews(mockNewsData);
+      // Filter mock data based on user's housing companies
+      let filteredMockData = mockNewsData;
+      if (user?.housing_companies && user.housing_companies.length > 0) {
+        filteredMockData = mockNewsData.filter(item =>
+          user.housing_companies!.includes(item.housing_company_id)
+        );
+      }
+      setNews(filteredMockData);
       setLoading(false);
       return;
     }
@@ -124,7 +149,22 @@ export function useNews(config: UseNewsConfig = {}): UseNewsReturn {
     setError(null);
 
     try {
-      const fetchedNews = await newsServiceRef.current!.fetchNews();
+      console.log('useNews: Loading news for user:', user);
+      let fetchedNews: NewsItem[];
+      
+      if (user?.housing_companies && user.housing_companies.length > 0) {
+        // Fetch news for user's housing companies
+        fetchedNews = await newsServiceRef.current!.fetchNewsForHousingCompanies(
+          user.housing_companies
+        );
+        console.log('useNews: Fetched news count:', fetchedNews.length);
+      } else {
+        // No housing companies = no news
+        fetchedNews = [];
+        setError('No housing companies assigned to your account');
+        console.log('useNews: No housing companies assigned to user');
+      }
+
       newsServiceRef.current!.updateCache(fetchedNews);
       setNews(fetchedNews);
       setLastSyncTime(new Date());

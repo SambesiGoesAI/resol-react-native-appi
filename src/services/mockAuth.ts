@@ -6,6 +6,7 @@ export interface MockUser {
   email: string;
   role: string;
   access_code: string;
+  housing_companies?: string[]; // Array of housing company IDs
 }
 
 // Mock users database
@@ -15,18 +16,21 @@ const mockUsers: MockUser[] = [
     email: 'admin@example.com',
     access_code: 'ADMIN123',
     role: 'admin',
+    housing_companies: ['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb']
   },
   {
     id: '2',
     email: 'user@example.com',
     access_code: 'USER456',
     role: 'user',
+    housing_companies: ['bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb']
   },
   {
     id: '3',
     email: 'guest@example.com',
     access_code: 'GUEST789',
     role: 'guest',
+    housing_companies: ['cccccccc-cccc-cccc-cccc-cccccccccccc']
   },
 ];
 
