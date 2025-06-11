@@ -7,12 +7,12 @@ export interface ChatMessage {
 
 export interface WebhookRequest {
   message: string;
-  sessionID?: string;
+  sessionId?: string;
 }
 
 export interface WebhookResponse {
   agentMessage: string;
-  sessionID: string;
+  sessionId: string;
 }
 
 export interface ChatSession {

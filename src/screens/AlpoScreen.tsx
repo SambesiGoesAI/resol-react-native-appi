@@ -65,6 +65,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   };
 
   const handleSendMessage = useCallback(async (messageText: string) => {
+    console.log('[AlpoScreen] handleSendMessage called with:', messageText);
     if (!messageText.trim() || chatState.isLoading) return;
 
     // Clear any previous errors
@@ -79,19 +80,24 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     try {
       // Send message to webhook
       const response = await chatService.sendMessage(messageText);
+      console.log('[AlpoScreen] Received response:', response);
       
       // Add agent response
       addMessage(response.agentMessage, false);
 
       // Update session ID if received
+      if (response.sessionId) {
+        console.log('[AlpoScreen] Setting sessionID:', response.sessionId);
+        chatService.setSessionID(response.sessionId);
+      }
       setChatState(prev => ({
         ...prev,
-        sessionID: response.sessionID,
         isLoading: false,
       }));
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Tuntematon virhe tapahtui';
+      console.error('[AlpoScreen] Error sending message:', errorMessage);
       
       setChatState(prev => ({
         ...prev,
@@ -129,7 +135,6 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
                 messages: [],
                 isLoading: false,
                 error: null,
-                sessionID: null,
               });
             } catch (error) {
               console.error('Failed to clear chat:', error);
