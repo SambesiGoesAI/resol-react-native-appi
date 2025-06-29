@@ -1,16 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import RenderHTML from 'react-native-render-html';
-import { ThemeContext } from '../context/ThemeContext';
 import { ChatMessage as ChatMessageType } from '../types/chat';
 import { sanitize } from '../utils/sanitizeHtml';
+import { Colors } from '../constants/colors';
 
 interface ChatMessageProps {
   message: ChatMessageType;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  const { isDarkMode } = useContext(ThemeContext);
 
   const formatTime = (date: Date): string => {
     return date.toLocaleTimeString('fi-FI', { 
@@ -22,8 +21,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const contentWidth = Dimensions.get('window').width * 0.8;
   const containsHTML = /<[a-z][\s\S]*>/i.test(message.text);
   const baseTextStyle = message.isUser
-    ? [styles.userText, isDarkMode ? styles.userTextDark : null]
-    : [styles.agentText, isDarkMode ? styles.agentTextDark : null];
+    ? styles.userText
+    : styles.agentText;
 
   return (
     <View style={[
@@ -33,41 +32,73 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       <View style={[
         styles.messageBubble,
         message.isUser
-          ? [styles.userBubble, isDarkMode ? styles.userBubbleDark : null]
-          : [styles.agentBubble, isDarkMode ? styles.agentBubbleDark : null]
+          ? styles.userBubble
+          : styles.agentBubble
       ]}>
-        {containsHTML ? (
-          <View>
-            <RenderHTML
-              contentWidth={contentWidth}
-              source={{ html: sanitize(message.text) }}
-              baseStyle={baseTextStyle[0] || {}}
-              tagsStyles={{
-                a: { textDecorationLine: 'underline', color: baseTextStyle[0]?.color || '#0000EE' },
-                b: baseTextStyle[0] || {},
-                i: baseTextStyle[0] || {},
-                u: baseTextStyle[0] || {},
-                em: baseTextStyle[0] || {},
-                strong: baseTextStyle[0] || {},
-                p: baseTextStyle[0] || {},
-                li: baseTextStyle[0] || {},
-                ul: baseTextStyle[0] || {},
-                ol: baseTextStyle[0] || {},
-                br: baseTextStyle[0] || {},
-                img: { maxWidth: '100%', height: 'auto' },
-              }}
-            />
-          </View>
+        {message.isUser ? (
+          containsHTML ? (
+            <View>
+              <RenderHTML
+                contentWidth={contentWidth}
+                source={{ html: sanitize(message.text) }}
+                baseStyle={StyleSheet.flatten(baseTextStyle) || {}}
+                tagsStyles={{
+                  a: { textDecorationLine: 'underline', color: Colors.primary },
+                  b: baseTextStyle || {},
+                  i: baseTextStyle || {},
+                  u: baseTextStyle || {},
+                  em: baseTextStyle || {},
+                  strong: baseTextStyle || {},
+                  p: baseTextStyle || {},
+                  li: baseTextStyle || {},
+                  ul: baseTextStyle || {},
+                  ol: baseTextStyle || {},
+                  br: baseTextStyle || {},
+                  img: { maxWidth: '100%', height: 'auto' },
+                }}
+              />
+            </View>
+          ) : (
+            <Text style={baseTextStyle}>
+              {message.text}
+            </Text>
+          )
         ) : (
-          <Text style={baseTextStyle}>
-            {message.text}
-          </Text>
+          // Agent message
+          containsHTML ? (
+            <View>
+              <RenderHTML
+                contentWidth={contentWidth}
+                source={{ html: sanitize(`<b>Virtuaalitalkkari Alpo</b><br/>${message.text}`) }}
+                baseStyle={StyleSheet.flatten(baseTextStyle) || {}}
+                tagsStyles={{
+                  a: { textDecorationLine: 'underline', color: Colors.primary },
+                  b: { fontWeight: 'bold', color: Colors.agentText },
+                  i: baseTextStyle || {},
+                  u: baseTextStyle || {},
+                  em: baseTextStyle || {},
+                  strong: baseTextStyle || {},
+                  p: baseTextStyle || {},
+                  li: baseTextStyle || {},
+                  ul: baseTextStyle || {},
+                  ol: baseTextStyle || {},
+                  br: baseTextStyle || {},
+                  img: { maxWidth: '100%', height: 'auto' },
+                }}
+              />
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.agentHeader}>Virtuaalitalkkari Alpo</Text>
+              <Text style={baseTextStyle}>{message.text}</Text>
+            </View>
+          )
         )}
         <Text style={[
           styles.timestamp,
           message.isUser
-            ? [styles.userTimestamp, isDarkMode ? styles.userTimestampDark : null]
-            : [styles.agentTimestamp, isDarkMode ? styles.agentTimestampDark : null]
+            ? styles.userTimestamp
+            : styles.agentTimestamp
         ]}>
           {formatTime(message.timestamp)}
         </Text>
@@ -101,34 +132,27 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.chatUserBubble,
     borderBottomRightRadius: 4,
   },
-  userBubbleDark: {
-    backgroundColor: '#0A84FF',
-  },
   agentBubble: {
-    backgroundColor: '#E5E5EA',
+    backgroundColor: Colors.chatAgentBubble,
     borderBottomLeftRadius: 4,
-  },
-  agentBubbleDark: {
-    backgroundColor: '#2C2C2E',
   },
   messageText: {
     fontSize: 16,
     lineHeight: 22,
   },
   userText: {
-    color: '#FFFFFF',
-  },
-  userTextDark: {
-    color: '#FFFFFF',
+    color: Colors.chatUserText,
   },
   agentText: {
-    color: '#000000',
+    color: Colors.chatAgentText,
   },
-  agentTextDark: {
-    color: '#FFFFFF',
+  agentHeader: {
+    fontWeight: 'bold',
+    color: Colors.chatAgentText,
+    marginBottom: 5,
   },
   timestamp: {
     fontSize: 12,
@@ -136,16 +160,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   userTimestamp: {
-    color: '#FFFFFF',
+    color: Colors.chatUserText,
     textAlign: 'right',
   },
-  userTimestampDark: {
-    color: '#FFFFFF',
-  },
   agentTimestamp: {
-    color: '#666666',
-  },
-  agentTimestampDark: {
-    color: '#CCCCCC',
+    color: Colors.chatAgentText,
   },
 });

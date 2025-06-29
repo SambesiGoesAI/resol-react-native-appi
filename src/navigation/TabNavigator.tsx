@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
@@ -6,8 +6,8 @@ import { AlpoScreen } from '../screens/AlpoScreen';
 import { UutisetScreen } from '../screens/UutisetScreen';
 import { OhjeetScreen } from '../screens/OhjeetScreen';
 import { WebViewScreen } from '../screens/WebViewScreen';
-import { ThemeContext } from '../context/ThemeContext';
 import { User } from '../services/auth';
+import { Colors } from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +17,6 @@ interface TabNavigatorProps {
 }
 
 export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) => {
-  const { isDarkMode } = useContext(ThemeContext);
 
   return (
     <Tab.Navigator
@@ -29,24 +28,22 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Uutiset') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
+          } else if (route.name === 'Huoltopyyntö') {
+            iconName = focused ? 'clipboard' : 'clipboard-outline';
           } else if (route.name === 'Ohjeet') {
             iconName = focused ? 'help-circle' : 'help-circle-outline';
-          } else if (route.name === 'Ohjeet') {
-            iconName = focused ? 'help-circle' : 'help-circle-outline';
-          } else if (route.name === 'Web') {
-            iconName = focused ? 'globe' : 'globe-outline';
           } else {
             iconName = 'help-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: isDarkMode ? '#0A84FF' : '#007AFF',
-        tabBarInactiveTintColor: isDarkMode ? '#8E8E93' : 'gray',
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.gray,
         headerStyle: {
-          backgroundColor: isDarkMode ? '#121212' : '#007AFF',
+          backgroundColor: Colors.headerBackground,
         },
-        headerTintColor: isDarkMode ? '#FFFFFF' : '#FFFFFF',
+        headerTintColor: Colors.white,
         headerTitleStyle: {
           fontWeight: 'bold',
         },

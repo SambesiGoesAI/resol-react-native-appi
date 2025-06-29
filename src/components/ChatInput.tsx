@@ -1,7 +1,7 @@
-import React, { useContext, useState, forwardRef } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
 import './ChatInputFocusOverride.css';
+import { Colors } from '../constants/colors';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -14,7 +14,6 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
   isLoading,
   disabled = false
 }, ref) => {
-  const { isDarkMode } = useContext(ThemeContext);
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [inputKey, setInputKey] = useState(0); // State to force TextInput re-mount
@@ -30,62 +29,59 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
 
   const canSend = message.trim().length > 0 && !isLoading && !disabled;
 
+  // New condition: treat focused input as "canSend" for styling purposes
+  const showActiveStyle = (message.trim().length > 0 || isFocused) && !isLoading && !disabled;
+
   return (
-    <View style={[
-      styles.container,
-      isDarkMode ? styles.containerDark : null
-    ]}>
+    <View style={styles.container}>
       <View style={[
         styles.inputContainer,
-        isDarkMode ? styles.inputContainerDark : null,
         (isFocused && !isLoading) ? styles.inputContainerFocused : null
       ]}>
         <TextInput
           key={inputKey}
           style={[
             styles.textInput,
-            isDarkMode ? styles.textInputDark : null,
             message.length > 0 ? styles.textInputFocused : null
           ]}
           value={message}
           onChangeText={setMessage}
           placeholder="Kirjoita viesti..."
-          placeholderTextColor={isDarkMode ? '#666666' : '#999999'}
+          placeholderTextColor={'#999999'}
           multiline
           maxLength={1000}
           editable={!isLoading && !disabled}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onKeyPress={(e) => {
-            if (e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+            if (e.nativeEvent.key === 'Enter') {
               e.preventDefault();
               handleSend();
             }
           }}
-          className="chat-input-no-outline"
           ref={ref}
         />
         <TouchableOpacity
           style={[
             styles.sendButton,
-            canSend 
-              ? [styles.sendButtonActive, isDarkMode ? styles.sendButtonActiveDark : null]
-              : [styles.sendButtonInactive, isDarkMode ? styles.sendButtonInactiveDark : null]
+            showActiveStyle
+              ? styles.sendButtonActive
+              : styles.sendButtonInactive
           ]}
           onPress={handleSend}
           disabled={!canSend}
         >
           {isLoading ? (
-            <ActivityIndicator 
-              size="small" 
-              color={isDarkMode ? '#FFFFFF' : '#FFFFFF'} 
+            <ActivityIndicator
+              size="small"
+              color={'#FFFFFF'}
             />
           ) : (
             <Text style={[
               styles.sendButtonText,
-              canSend 
-                ? [styles.sendButtonTextActive, isDarkMode ? styles.sendButtonTextActiveDark : null]
-                : [styles.sendButtonTextInactive, isDarkMode ? styles.sendButtonTextInactiveDark : null]
+              showActiveStyle
+                ? styles.sendButtonTextActive
+                : styles.sendButtonTextInactive
             ]}>
               Lähetä
             </Text>
@@ -100,37 +96,27 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
-  },
-  containerDark: {
-    backgroundColor: '#1C1C1E',
-    borderTopColor: '#2C2C2E',
+    borderTopColor: Colors.secondary,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Colors.lightGray,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     minHeight: 44,
   },
-  inputContainerDark: {
-    backgroundColor: '#2C2C2E',
-  },
   textInput: {
     flex: 1,
     fontSize: 16,
-    color: '#000000',
+    color: Colors.black,
     maxHeight: 100,
     paddingVertical: 8,
     borderWidth: 0,
     borderColor: 'transparent',
-  },
-  textInputDark: {
-    color: '#FFFFFF',
   },
   sendButton: {
     marginLeft: 12,
@@ -142,38 +128,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sendButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  sendButtonActiveDark: {
-    backgroundColor: '#0A84FF',
+    backgroundColor: Colors.chatSendButtonBackground,
   },
   sendButtonInactive: {
-    backgroundColor: '#E5E5EA',
-  },
-  sendButtonInactiveDark: {
-    backgroundColor: '#48484A',
+    backgroundColor: Colors.secondary,
   },
   sendButtonText: {
     fontSize: 14,
     fontWeight: '600',
   },
   sendButtonTextActive: {
-    color: '#FFFFFF',
-  },
-  sendButtonTextActiveDark: {
-    color: '#FFFFFF',
+    color: Colors.chatSendButtonText,
   },
   sendButtonTextInactive: {
-    color: '#999999',
-  },
-  sendButtonTextInactiveDark: {
-    color: '#666666',
+    color: Colors.mediumGray,
   },
   textInputFocused: {
-    borderColor: '#000000', // dark gray color for focus frame
+    borderColor: Colors.black, // dark gray color for focus frame
   },
   inputContainerFocused: {
-    borderColor: '#555555', // dark gray color for focus frame
+    borderColor: Colors.darkGray, // dark gray color for focus frame
     borderWidth: 1,
   },
 });

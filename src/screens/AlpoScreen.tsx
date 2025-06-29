@@ -1,19 +1,18 @@
-import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, TextInput } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
-import { ThemeContext } from '../context/ThemeContext';
 import { User } from '../services/auth';
 import { ChatContainer } from '../components/ChatContainer';
 import { ChatInput } from '../components/ChatInput';
 import { chatService } from '../services/chatService';
 import { ChatMessage, ChatState } from '../types/chat';
+import { Colors } from '../constants/colors';
 
 interface AlpoScreenProps {
   user: User | null;
 }
 
 export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
-  const { isDarkMode } = useContext(ThemeContext);
   const isFocused = useIsFocused();
   const inputRef = useRef<TextInput>(null);
   
@@ -131,7 +130,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, isDarkMode ? styles.containerDark : null]}
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
@@ -153,9 +152,6 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  containerDark: {
-    backgroundColor: '#121212',
+    backgroundColor: Colors.background,
   },
 });

@@ -1,13 +1,12 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
+import { Colors } from '../constants/colors';
 
 interface SplashScreenProps {
   onAnimationComplete: () => void;
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
-  const { isDarkMode } = useContext(ThemeContext);
 
   React.useEffect(() => {
     // Simulate splash screen duration
@@ -19,9 +18,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete 
   }, [onAnimationComplete]);
 
   return (
-    <View style={[styles.container, isDarkMode ? styles.containerDark : null]}>
-      <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Alpo auttaa!</Text>
-      <ActivityIndicator size="large" color={isDarkMode ? '#0A84FF' : '#007AFF'} style={styles.loader} />
+    <View style={styles.container}>
+      <Text style={styles.title}>Alpo auttaa!</Text>
+      <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
     </View>
   );
 };
@@ -31,19 +30,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  containerDark: {
-    backgroundColor: '#121212',
+    backgroundColor: Colors.background,
   },
   title: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333333',
+    color: Colors.text,
     marginBottom: 40,
-  },
-  titleDark: {
-    color: '#FFFFFF',
   },
   loader: {
     marginTop: 20,

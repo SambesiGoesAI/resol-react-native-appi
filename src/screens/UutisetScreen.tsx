@@ -1,13 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
 import { useNews } from '../services/useNews';
 import { NewsCard } from '../components/NewsCard';
 import { User } from '../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '../constants/colors';
 
 export const UutisetScreen: React.FC = () => {
-  const { isDarkMode } = useContext(ThemeContext);
   const [user, setUser] = useState<User | null>(null);
   const [userLoading, setUserLoading] = useState(true);
   
@@ -32,9 +31,9 @@ export const UutisetScreen: React.FC = () => {
 
   if (userLoading) {
     return (
-      <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
-        <ActivityIndicator size="large" color={isDarkMode ? '#FFF' : '#333'} />
-        <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={Colors.text} />
+        <Text style={styles.text}>
           Ladataan käyttäjätietoja...
         </Text>
       </View>
@@ -43,9 +42,9 @@ export const UutisetScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
-        <ActivityIndicator size="large" color={isDarkMode ? '#FFF' : '#333'} />
-        <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={Colors.text} />
+        <Text style={styles.text}>
           Ladataan uutisia...
         </Text>
       </View>
@@ -54,8 +53,8 @@ export const UutisetScreen: React.FC = () => {
 
   if (error && news.length === 0) {
     return (
-      <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
-        <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.text}>
           {error}
         </Text>
       </View>
@@ -64,8 +63,8 @@ export const UutisetScreen: React.FC = () => {
 
   if (!user) {
     return (
-      <View style={[styles.container, styles.centered, isDarkMode ? styles.containerDark : null]}>
-        <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.text}>
           Kirjaudu sisään nähdäksesi uutiset
         </Text>
       </View>
@@ -73,10 +72,10 @@ export const UutisetScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView style={[styles.container, isDarkMode ? styles.containerDark : null]}>
+    <ScrollView style={styles.container}>
       {news.length === 0 ? (
         <View style={styles.centered}>
-          <Text style={[styles.text, isDarkMode ? styles.textDark : null]}>
+          <Text style={styles.text}>
             Taloyhtiöllesi ei ole tällä hetkellä uutisia saatavilla
           </Text>
         </View>
@@ -92,21 +91,14 @@ export const UutisetScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  containerDark: {
-    backgroundColor: '#121212',
+    backgroundColor: Colors.background,
   },
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   text: {
-    color: '#333',
-    fontSize: 16,
-  },
-  textDark: {
-    color: '#FFF',
+    color: Colors.text,
     fontSize: 16,
   },
 });

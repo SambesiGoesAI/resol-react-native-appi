@@ -6,18 +6,14 @@ import { SplashScreen } from './src/screens/SplashScreen';
 import { LockScreen } from './src/screens/LockScreen';
 import { TabNavigator } from './src/navigation/TabNavigator';
 import { authService, User } from './src/services/auth';
-import { ThemeContext } from './src/context/ThemeContext';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
   useEffect(() => {
     checkAuthStatus();
-    loadDarkModePreference();
   }, []);
 
   const checkAuthStatus = async () => {
@@ -38,27 +34,6 @@ export default function App() {
       }
     } catch (error) {
       // Silent fail - auth check error
-    }
-  };
-
-  const loadDarkModePreference = async () => {
-    try {
-      const storedPreference = await AsyncStorage.getItem('darkMode');
-      if (storedPreference !== null) {
-        setIsDarkMode(storedPreference === 'true');
-      }
-    } catch (error) {
-      // Silent fail - dark mode preference error
-    }
-  };
-
-  const toggleDarkMode = async () => {
-    try {
-      const newValue = !isDarkMode;
-      setIsDarkMode(newValue);
-      await AsyncStorage.setItem('darkMode', newValue.toString());
-    } catch (error) {
-      // Silent fail - dark mode save error
     }
   };
 
@@ -88,16 +63,14 @@ export default function App() {
   }
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
-      <SafeAreaProvider>
-        <NavigationContainer key={isAuthenticated ? 'auth' : 'noauth'}>
-          {isAuthenticated ? (
-            <TabNavigator user={user} onLogout={handleLogout} />
-          ) : (
-            <LockScreen onLoginSuccess={handleLoginSuccess} />
-          )}
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </ThemeContext.Provider>
+    <SafeAreaProvider>
+      <NavigationContainer key={isAuthenticated ? 'auth' : 'noauth'}>
+        {isAuthenticated ? (
+          <TabNavigator user={user} onLogout={handleLogout} />
+        ) : (
+          <LockScreen onLoginSuccess={handleLoginSuccess} />
+        )}
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

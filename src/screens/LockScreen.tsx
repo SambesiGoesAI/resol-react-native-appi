@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { authService, User } from '../services/auth';
-import { ThemeContext } from '../context/ThemeContext';
+import { Colors } from '../constants/colors';
 
 interface LockScreenProps {
   onLoginSuccess: (user: User) => void;
@@ -20,7 +20,6 @@ interface LockScreenProps {
 export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
   const [accessCode, setAccessCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { isDarkMode } = useContext(ThemeContext);
   const inputRef = React.useRef<TextInput>(null);
 
   React.useEffect(() => {
@@ -51,30 +50,20 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
 
   return (
     <KeyboardAvoidingView 
-      style={[styles.container, isDarkMode ? styles.containerDark : null]}
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, styles.titleCentered, isDarkMode ? styles.titleDark : null]}>Tervetuloa Resol-sovellukseen!</Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
-          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.
-
-Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
-        
-Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:
-030 450 4850 (avoinna: 08:00 - 17:00).
-
-Päivystäjämme tavoitat 24h numerosta:
-044 796 7982.
-
-Voit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
+        <Text style={[styles.title, styles.titleCentered]}>Tervetuloa Resol-sovellukseen!</Text>
+        <Text style={styles.subtitle}>
+          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.\n\nHuomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n        \nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:\n030 450 4850 (avoinna: 08:00 - 17:00).\n\nPäivystäjämme tavoitat 24h numerosta:\n044 796 7982.\n\nVoit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
         </Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
+        <Text style={styles.subtitle}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
         
         <TextInput
-          style={[styles.input, isDarkMode ? styles.inputDark : null]}
+          style={styles.input}
           placeholder="Pääsykoodi"
-          placeholderTextColor={isDarkMode ? '#AAAAAA' : '#999999'}
+          placeholderTextColor={Colors.loginPlaceholder}
           value={accessCode}
           onChangeText={setAccessCode}
           secureTextEntry
@@ -87,14 +76,14 @@ Voit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
         />
         
         <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled, isDarkMode ? styles.buttonDark : null]}
+          style={[styles.button, isLoading && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={isLoading}
         >
           {isLoading ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={Colors.white} />
           ) : (
-            <Text style={[styles.buttonText, isDarkMode ? styles.buttonTextDark : null]}>Kirjaudu</Text>
+            <Text style={styles.buttonText}>Kirjaudu</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -105,10 +94,7 @@ Voit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  containerDark: {
-    backgroundColor: '#121212',
+    backgroundColor: Colors.loginBackground,
   },
   content: {
     flex: 1,
@@ -119,59 +105,42 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333333',
+    color: Colors.loginText,
     marginBottom: 10,
-  },
-  titleDark: {
-    color: '#FFFFFF',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: Colors.loginText,
     marginBottom: 40,
     textAlign: 'center',
-  },
-  subtitleDark: {
-    color: '#CCCCCC',
   },
   input: {
     width: '100%',
     height: 50,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.lightGray,
     marginBottom: 20,
-    color: '#000000',
-  },
-  inputDark: {
-    backgroundColor: '#1E1E1E',
-    borderColor: '#444444',
-    color: '#FFFFFF',
+    color: Colors.loginInputText,
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.loginButton,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonDark: {
-    backgroundColor: '#0A84FF',
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: 18,
     fontWeight: '600',
-  },
-  buttonTextDark: {
-    color: '#FFFFFF',
   },
   titleCentered: {
     textAlign: 'center',

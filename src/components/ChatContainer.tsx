@@ -1,6 +1,6 @@
-import React, { useContext, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, FlatList, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
+import { Colors } from '../constants/colors';
 import { ChatMessage as ChatMessageType } from '../types/chat';
 import { ChatMessage } from './ChatMessage';
 
@@ -17,7 +17,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   error,
   onRetry,
 }) => {
-  const { isDarkMode } = useContext(ThemeContext);
   const flatListRef = useRef<FlatList>(null);
 
   // Deduplicate messages by ID to avoid duplicate key errors
@@ -30,8 +29,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         } else {
           console.warn('ChatContainer: Duplicate message ID found and ignored:', msg.id);
         }
-      } else {
-        console.warn('ChatContainer: Message with missing id detected:', msg);
       }
     });
     return map;
@@ -70,42 +67,26 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Text style={[
-        styles.emptyTitle,
-        isDarkMode ? styles.emptyTitleDark : null
-      ]}>
+      <Text style={styles.emptyTitle}>
         Tässä voit aloittaa keskustelun Alpon kanssa!
       </Text>
-      <Text style={[
-        styles.emptySubtitle,
-        isDarkMode ? styles.emptySubtitleDark : null
-      ]}>
-        {`Kirjoita kysymyksesi alla olevaan tekstikenttään ja paina 'Lähetä' - Alpo vastaa sinulle pian 👷🏻‍♂️ \n\n Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
-        \n\nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).\n\n Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
+      <Text style={styles.emptySubtitle}>
+        {`Kirjoita kysymyksesi alla olevaan tekstikenttään ja paina 'Lähetä' - Alpo vastaa sinulle pian 👷🏻‍♂️ \n\n Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n\nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).\n\n Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
       </Text>
     </View>
   );
 
   const renderError = () => (
     <View style={styles.errorContainer}>
-      <Text style={[
-        styles.errorText,
-        isDarkMode ? styles.errorTextDark : null
-      ]}>
+      <Text style={styles.errorText}>
         {error}
       </Text>
       {onRetry && (
         <TouchableOpacity
-          style={[
-            styles.retryButton,
-            isDarkMode ? styles.retryButtonDark : null
-          ]}
+          style={styles.retryButton}
           onPress={onRetry}
         >
-          <Text style={[
-            styles.retryButtonText,
-            isDarkMode ? styles.retryButtonTextDark : null
-          ]}>
+          <Text style={styles.retryButtonText}>
             Yritä uudelleen
           </Text>
         </TouchableOpacity>
@@ -115,10 +96,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
   const renderLoadingIndicator = () => {
     // Move hooks to top-level component scope to avoid violating rules of hooks
-    return <LoadingDots isDarkMode={isDarkMode} />;
+    return <LoadingDots />;
   };
   
-  const LoadingDots: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+  const LoadingDots: React.FC = () => {
     const dot1Opacity = useRef(new Animated.Value(0)).current;
     const dot2Opacity = useRef(new Animated.Value(0)).current;
     const dot3Opacity = useRef(new Animated.Value(0)).current;
@@ -159,14 +140,11 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   
     return (
       <View style={styles.loadingContainer}>
-        <View style={[
-          styles.loadingBubble,
-          isDarkMode ? styles.loadingBubbleDark : null
-        ]}>
+        <View style={styles.loadingBubble}>
           <View style={styles.loadingDots}>
-            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot1Opacity }]} />
-            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot2Opacity }]} />
-            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot3Opacity }]} />
+            <Animated.View style={[styles.dot, { opacity: dot1Opacity }]} />
+            <Animated.View style={[styles.dot, { opacity: dot2Opacity }]} />
+            <Animated.View style={[styles.dot, { opacity: dot3Opacity }]} />
           </View>
         </View>
       </View>
@@ -174,10 +152,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   return (
-    <View style={[
-      styles.container,
-      isDarkMode ? styles.containerDark : null
-    ]}>
+    <View style={styles.container}>
       <FlatList
         ref={flatListRef}
         data={uniqueMessages}
@@ -205,34 +180,25 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  containerDark: {
-    backgroundColor: '#000000',
+    backgroundColor: Colors.background,
   },
   headerContainer: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: Colors.border,
   },
   clearButton: {
     alignSelf: 'flex-end',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#FF3B30',
+    backgroundColor: Colors.error,
     borderRadius: 16,
   },
-  clearButtonDark: {
-    backgroundColor: '#FF453A',
-  },
   clearButtonText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: 12,
     fontWeight: '600',
-  },
-  clearButtonTextDark: {
-    color: '#FFFFFF',
   },
   messagesList: {
     flex: 1,
@@ -251,21 +217,15 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333333',
+    color: Colors.text,
     marginBottom: 8,
     textAlign: 'center',
   },
-  emptyTitleDark: {
-    color: '#FFFFFF',
-  },
   emptySubtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
-  },
-  emptySubtitleDark: {
-    color: '#CCCCCC',
   },
   loadingContainer: {
     paddingHorizontal: 16,
@@ -273,14 +233,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   loadingBubble: {
-    backgroundColor: '#E5E5EA',
+    backgroundColor: Colors.bubbleBackground,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
     paddingHorizontal: 16,
     paddingVertical: 12,
-  },
-  loadingBubbleDark: {
-    backgroundColor: '#2C2C2E',
   },
   loadingDots: {
     flexDirection: 'row',
@@ -290,11 +247,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#999999',
+    backgroundColor: Colors.dot,
     marginHorizontal: 2,
-  },
-  dotDark: {
-    backgroundColor: '#666666',
   },
   errorContainer: {
     paddingHorizontal: 16,
@@ -303,28 +257,19 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#FF3B30',
+    color: Colors.error,
     textAlign: 'center',
     marginBottom: 8,
-  },
-  errorTextDark: {
-    color: '#FF453A',
   },
   retryButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary,
     borderRadius: 16,
   },
-  retryButtonDark: {
-    backgroundColor: '#0A84FF',
-  },
   retryButtonText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontSize: 14,
     fontWeight: '600',
-  },
-  retryButtonTextDark: {
-    color: '#FFFFFF',
   },
 });
