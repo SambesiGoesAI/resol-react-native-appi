@@ -9,6 +9,7 @@ export interface NewsItem {
   text: string;
   imagePath?: string;
   image_url?: string;
+  thumbnail?: string; // Local asset file name stored in Supabase
   created_at?: string;
   housing_company_id: string;
   housing_company_name?: string;

@@ -11,6 +11,7 @@ const MAX_LINES_COLLAPSED = 3;
 // Static mapping of image paths to require calls
 const imageMap: { [key: string]: any } = {
   'icon.png': require('../../assets/icon.png'),
+  'ruoho.png': require('../../assets/ruoho.png'),
   // Add other images here as needed, e.g.:
   // 'image1.png': require('../../assets/image1.png'),
 };

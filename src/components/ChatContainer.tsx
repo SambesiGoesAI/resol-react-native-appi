@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
 import { ChatMessage as ChatMessageType } from '../types/chat';
 import { ChatMessage } from './ChatMessage';
@@ -20,6 +20,41 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   const { isDarkMode } = useContext(ThemeContext);
   const flatListRef = useRef<FlatList>(null);
 
+  // Deduplicate messages by ID to avoid duplicate key errors
+  const uniqueMessagesMap = React.useMemo(() => {
+    const map = new Map<string, ChatMessageType>();
+    messages.forEach(msg => {
+      if (msg.id) {
+        if (!map.has(msg.id)) {
+          map.set(msg.id, msg);
+        } else {
+          console.warn('ChatContainer: Duplicate message ID found and ignored:', msg.id);
+        }
+      } else {
+        console.warn('ChatContainer: Message with missing id detected:', msg);
+      }
+    });
+    return map;
+  }, [messages]);
+
+  const uniqueMessages = Array.from(uniqueMessagesMap.values());
+
+  // Diagnostic: Check for duplicate or missing message IDs
+  React.useEffect(() => {
+    const idCounts: Record<string, number> = {};
+    uniqueMessages.forEach(msg => {
+      if (!msg.id) {
+        console.warn('ChatContainer: Message with missing id detected:', msg);
+      } else {
+        idCounts[msg.id] = (idCounts[msg.id] || 0) + 1;
+      }
+    });
+    const duplicates = Object.entries(idCounts).filter(([id, count]) => count > 1);
+    if (duplicates.length > 0) {
+      console.warn('ChatContainer: Duplicate message IDs detected:', duplicates);
+    }
+  }, [uniqueMessages]);
+
   useEffect(() => {
     // Auto-scroll to bottom when new messages are added
     if (messages.length > 0) {
@@ -30,7 +65,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   }, [messages.length]);
 
   const renderMessage = ({ item }: { item: ChatMessageType }) => (
-    <ChatMessage message={item} />
+    <ChatMessage key={item.id} message={item} />
   );
 
   const renderEmptyState = () => (
@@ -39,13 +74,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         styles.emptyTitle,
         isDarkMode ? styles.emptyTitleDark : null
       ]}>
-        Tervetuloa keskustelemaan!
+        Tässä voit aloittaa keskustelun Alpon kanssa!
       </Text>
       <Text style={[
         styles.emptySubtitle,
         isDarkMode ? styles.emptySubtitleDark : null
       ]}>
-        Aloita keskustelu kirjoittamalla viesti alle.
+        {`Kirjoita kysymyksesi alla olevaan tekstikenttään ja paina 'Lähetä' - Alpo vastaa sinulle pian 👷🏻‍♂️ \n\n Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
+        \n\nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).\n\n Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
       </Text>
     </View>
   );
@@ -77,20 +113,65 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     </View>
   );
 
-  const renderLoadingIndicator = () => (
-    <View style={styles.loadingContainer}>
-      <View style={[
-        styles.loadingBubble,
-        isDarkMode ? styles.loadingBubbleDark : null
-      ]}>
-        <View style={styles.loadingDots}>
-          <View style={[styles.dot, isDarkMode ? styles.dotDark : null]} />
-          <View style={[styles.dot, isDarkMode ? styles.dotDark : null]} />
-          <View style={[styles.dot, isDarkMode ? styles.dotDark : null]} />
+  const renderLoadingIndicator = () => {
+    // Move hooks to top-level component scope to avoid violating rules of hooks
+    return <LoadingDots isDarkMode={isDarkMode} />;
+  };
+  
+  const LoadingDots: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+    const dot1Opacity = useRef(new Animated.Value(0)).current;
+    const dot2Opacity = useRef(new Animated.Value(0)).current;
+    const dot3Opacity = useRef(new Animated.Value(0)).current;
+  
+    useEffect(() => {
+      const createAnimation = (animatedValue: Animated.Value, delay: number) => {
+        return Animated.loop(
+          Animated.sequence([
+            Animated.delay(delay),
+            Animated.timing(animatedValue, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(animatedValue, {
+              toValue: 0,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+          ])
+        );
+      };
+  
+      const anim1 = createAnimation(dot1Opacity, 0);
+      const anim2 = createAnimation(dot2Opacity, 250);
+      const anim3 = createAnimation(dot3Opacity, 500);
+  
+      anim1.start();
+      anim2.start();
+      anim3.start();
+  
+      return () => {
+        anim1.stop();
+        anim2.stop();
+        anim3.stop();
+      };
+    }, [dot1Opacity, dot2Opacity, dot3Opacity]);
+  
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={[
+          styles.loadingBubble,
+          isDarkMode ? styles.loadingBubbleDark : null
+        ]}>
+          <View style={styles.loadingDots}>
+            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot1Opacity }]} />
+            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot2Opacity }]} />
+            <Animated.View style={[styles.dot, isDarkMode ? styles.dotDark : null, { opacity: dot3Opacity }]} />
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[
@@ -99,18 +180,18 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     ]}>
       <FlatList
         ref={flatListRef}
-        data={messages}
+        data={uniqueMessages}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}
         contentContainerStyle={[
           styles.messagesContent,
-          messages.length === 0 ? styles.messagesContentEmpty : null
+          uniqueMessages.length === 0 ? styles.messagesContentEmpty : null
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderEmptyState}
         onContentSizeChange={() => {
-          if (messages.length > 0) {
+          if (uniqueMessages.length > 0) {
             flatListRef.current?.scrollToEnd({ animated: false });
           }
         }}

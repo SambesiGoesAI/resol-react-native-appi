@@ -20,7 +20,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete 
 
   return (
     <View style={[styles.container, isDarkMode ? styles.containerDark : null]}>
-      <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Alpo-sovellus</Text>
+      <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Alpo auttaa!</Text>
       <ActivityIndicator size="large" color={isDarkMode ? '#0A84FF' : '#007AFF'} style={styles.loader} />
     </View>
   );

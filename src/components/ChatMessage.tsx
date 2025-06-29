@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import RenderHTML from 'react-native-render-html';
 import { ThemeContext } from '../context/ThemeContext';
 import { ChatMessage as ChatMessageType } from '../types/chat';
+import { sanitize } from '../utils/sanitizeHtml';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -17,6 +19,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     });
   };
 
+  const contentWidth = Dimensions.get('window').width * 0.8;
+  const containsHTML = /<[a-z][\s\S]*>/i.test(message.text);
+  const baseTextStyle = message.isUser
+    ? [styles.userText, isDarkMode ? styles.userTextDark : null]
+    : [styles.agentText, isDarkMode ? styles.agentTextDark : null];
+
   return (
     <View style={[
       styles.container,
@@ -24,21 +32,40 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     ]}>
       <View style={[
         styles.messageBubble,
-        message.isUser 
+        message.isUser
           ? [styles.userBubble, isDarkMode ? styles.userBubbleDark : null]
           : [styles.agentBubble, isDarkMode ? styles.agentBubbleDark : null]
       ]}>
-        <Text style={[
-          styles.messageText,
-          message.isUser 
-            ? [styles.userText, isDarkMode ? styles.userTextDark : null]
-            : [styles.agentText, isDarkMode ? styles.agentTextDark : null]
-        ]}>
-          {message.text}
-        </Text>
+        {containsHTML ? (
+          <View>
+            <RenderHTML
+              contentWidth={contentWidth}
+              source={{ html: sanitize(message.text) }}
+              baseStyle={baseTextStyle[0] || {}}
+              tagsStyles={{
+                a: { textDecorationLine: 'underline', color: baseTextStyle[0]?.color || '#0000EE' },
+                b: baseTextStyle[0] || {},
+                i: baseTextStyle[0] || {},
+                u: baseTextStyle[0] || {},
+                em: baseTextStyle[0] || {},
+                strong: baseTextStyle[0] || {},
+                p: baseTextStyle[0] || {},
+                li: baseTextStyle[0] || {},
+                ul: baseTextStyle[0] || {},
+                ol: baseTextStyle[0] || {},
+                br: baseTextStyle[0] || {},
+                img: { maxWidth: '100%', height: 'auto' },
+              }}
+            />
+          </View>
+        ) : (
+          <Text style={baseTextStyle}>
+            {message.text}
+          </Text>
+        )}
         <Text style={[
           styles.timestamp,
-          message.isUser 
+          message.isUser
             ? [styles.userTimestamp, isDarkMode ? styles.userTimestampDark : null]
             : [styles.agentTimestamp, isDarkMode ? styles.agentTimestampDark : null]
         ]}>
@@ -48,6 +75,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     </View>
   );
 };
+// TODO: Manual test cases for HTML support:
+// - Basic tags: <b>, <i>, <u>, <em>, <strong>, <p>, <br>
+// - Links: <a href="..."> with various URLs
+// - Images: <img src="..." alt="..." width="..." height="...">
+// - Nested tags and complex HTML structures
+// - Verify no raw HTML tags appear in UI
+// - Confirm sanitization blocks scripts and unsafe attributes
 
 const styles = StyleSheet.create({
   container: {

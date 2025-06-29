@@ -15,45 +15,28 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
 
   const handleLogout = async () => {
     try {
-      // For mobile platforms, try Alert but with a timeout fallback
-      let alertShown = false;
-      
-      // Set a timeout to proceed with logout if Alert doesn't work
-      const timeoutId = setTimeout(async () => {
-        if (!alertShown) {
-          await performLogout();
-        }
-      }, 100);
-      
-      try {
-        Alert.alert(
-          'Kirjaudu ulos',
-          'Haluatko varmasti kirjautua ulos?',
-          [
-            {
-              text: 'Peruuta',
-              style: 'cancel',
-              onPress: () => {
-                alertShown = true;
-                clearTimeout(timeoutId);
-              },
+      // Show Alert dialog for logout confirmation without timeout fallback
+      Alert.alert(
+        'Kirjaudu ulos',
+        'Haluatko varmasti kirjautua ulos?',
+        [
+          {
+            text: 'Peruuta',
+            style: 'cancel',
+            onPress: () => {
+              // Do nothing on cancel
             },
-            {
-              text: 'Kirjaudu ulos',
-              style: 'destructive',
-              onPress: async () => {
-                alertShown = true;
-                clearTimeout(timeoutId);
-                await performLogout();
-              },
+          },
+          {
+            text: 'Kirjaudu ulos',
+            style: 'destructive',
+            onPress: async () => {
+              await performLogout();
             },
-          ],
-          { cancelable: false }
-        );
-      } catch (alertError) {
-        clearTimeout(timeoutId);
-        await performLogout();
-      }
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       // Silent fail
     }
