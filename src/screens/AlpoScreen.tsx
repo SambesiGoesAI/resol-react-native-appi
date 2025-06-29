@@ -20,12 +20,14 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     error: null,
   });
 
-  // Load existing messages and session on component mount
   useEffect(() => {
-    if (user) {
-      chatService.setUser(user);
-    }
-    loadChatHistory();
+    const initializeChat = async () => {
+      if (user) {
+        await chatService.setUser(user);
+        loadChatHistory();
+      }
+    };
+    initializeChat();
   }, [user]);
 
   const loadChatHistory = async () => {

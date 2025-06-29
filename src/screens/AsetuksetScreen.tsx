@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert, Platform } from 'react-native';
 import { authService, User } from '../services/auth';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -14,8 +14,19 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
   const [analytics, setAnalytics] = React.useState(false);
 
   const handleLogout = async () => {
-    try {
-      // Show Alert dialog for logout confirmation without timeout fallback
+    const logoutAction = async () => {
+      try {
+        await performLogout();
+      } catch (error) {
+        // Silent fail
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('Haluatko varmasti kirjautua ulos?')) {
+        logoutAction();
+      }
+    } else {
       Alert.alert(
         'Kirjaudu ulos',
         'Haluatko varmasti kirjautua ulos?',
@@ -23,22 +34,15 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
           {
             text: 'Peruuta',
             style: 'cancel',
-            onPress: () => {
-              // Do nothing on cancel
-            },
           },
           {
             text: 'Kirjaudu ulos',
             style: 'destructive',
-            onPress: async () => {
-              await performLogout();
-            },
+            onPress: logoutAction,
           },
         ],
         { cancelable: false }
       );
-    } catch (error) {
-      // Silent fail
     }
   };
   

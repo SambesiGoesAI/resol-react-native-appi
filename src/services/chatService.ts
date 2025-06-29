@@ -10,18 +10,22 @@ export class ChatService {
   private currentSession: ChatSession | null = null;
 
   /**
-   * Set the current user context
+   * Set the current user context and start a new chat session.
    */
-  setUser(user: User | null): void {
+  async setUser(user: User | null): Promise<void> {
     this.currentUser = user;
-    this.currentSession = null; // Reset session when user changes
+    if (user) {
+      await this.startNewSession();
+    } else {
+      this.currentSession = null;
+    }
   }
 
   /**
-   * Load user-specific messages from Supabase
+   * Load messages for the current active session from Supabase.
    */
   async loadMessages(): Promise<ChatMessage[]> {
-    if (!this.currentUser || !supabase) {
+    if (!this.currentUser || !this.currentSession || !supabase) {
       return [];
     }
 
@@ -29,7 +33,7 @@ export class ChatService {
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
-        .eq('user_id', this.currentUser.id)
+        .eq('session_id', this.currentSession.id)
         .order('timestamp', { ascending: true });
 
       if (error) {
@@ -46,6 +50,52 @@ export class ChatService {
     } catch (error) {
       console.error('Failed to load messages:', error);
       return [];
+    }
+  }
+
+  /**
+   * Deactivates all active sessions for the current user and creates a new one.
+   */
+  async startNewSession(): Promise<void> {
+    if (!this.currentUser || !supabase) {
+      return;
+    }
+
+    try {
+      // Deactivate all previous sessions for the user
+      await supabase
+        .from('chat_sessions')
+        .update({ is_active: false })
+        .eq('user_id', this.currentUser.id)
+        .eq('is_active', true);
+
+      // Create a new session
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert({
+          user_id: this.currentUser.id,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to create a new session:', error);
+        this.currentSession = null;
+        return;
+      }
+
+      this.currentSession = {
+        id: data.id,
+        userId: data.user_id,
+        webhookSessionId: data.webhook_session_id,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+        isActive: data.is_active,
+      };
+    } catch (error) {
+      console.error('Failed to start a new session:', error);
+      this.currentSession = null;
     }
   }
 
