@@ -63,33 +63,20 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
   return (
     <ScrollView style={[styles.container, isDarkMode ? styles.containerDark : null]}>
       <View style={styles.content}>
-        <Text style={[styles.title, isDarkMode ? styles.titleDark : null]}>Asetukset</Text>
         
-        <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
-          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Käyttäjätiedot</Text>
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Sähköposti:</Text>
-            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.email || 'Ei saatavilla'}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, isDarkMode ? styles.infoLabelDark : null]}>Rooli:</Text>
-            <Text style={[styles.infoValue, isDarkMode ? styles.infoValueDark : null]}>{user?.role || 'Tuntematon'}</Text>
-          </View>
-        </View>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
+          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.
+
+Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
+        
+Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).
+
+Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
+        </Text>
+        
+        
 
         <View style={[styles.section, isDarkMode ? styles.sectionDark : null]}>
-          <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : null]}>Asetukset</Text>
-          
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Tumma tila</Text>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleDarkMode}
-              trackColor={{ false: '#767577', true: '#007AFF' }}
-              thumbColor={isDarkMode ? '#FFFFFF' : '#f4f3f4'}
-            />
-          </View>
-          
           <View style={styles.settingRow}>
             <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Ilmoitukset</Text>
             <Switch
@@ -97,16 +84,6 @@ export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout
               onValueChange={setNotifications}
               trackColor={{ false: '#767577', true: '#007AFF' }}
               thumbColor={notifications ? '#FFFFFF' : '#f4f3f4'}
-            />
-          </View>
-          
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, isDarkMode ? styles.settingLabelDark : null]}>Analytiikka</Text>
-            <Switch
-              value={analytics}
-              onValueChange={setAnalytics}
-              trackColor={{ false: '#767577', true: '#007AFF' }}
-              thumbColor={analytics ? '#FFFFFF' : '#f4f3f4'}
             />
           </View>
         </View>
@@ -133,15 +110,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 30,
-  },
-  titleDark: {
-    color: '#FFFFFF',
-  },
+  
   section: {
     backgroundColor: '#FFFFFF',
     padding: 20,
@@ -200,8 +169,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
   },
-  settingLabelDark: {
-    color: '#FFFFFF',
+  subtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  subtitleDark: {
+    color: '#CCCCCC',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  subtitleDark: {
+    color: '#CCCCCC',
   },
   logoutButton: {
     backgroundColor: '#FF3B30',

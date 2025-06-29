@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AlpoScreen } from '../screens/AlpoScreen';
 import { UutisetScreen } from '../screens/UutisetScreen';
-import { AsetuksetScreen } from '../screens/AsetuksetScreen';
+import { AsetuksetScreen } from '../screens/OhjeetScreen';
 import { ThemeContext } from '../context/ThemeContext';
 import { User } from '../services/auth';
 
@@ -50,7 +50,7 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         {() => <AlpoScreen user={user} />}
       </Tab.Screen>
       <Tab.Screen name="Uutiset" component={UutisetScreen} />
-      <Tab.Screen name="Asetukset">
+      <Tab.Screen name="Ohjeet">
         {() => <AsetuksetScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
     </Tab.Navigator>
