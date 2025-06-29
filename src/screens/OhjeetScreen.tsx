@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert, Pl
 import { authService, User } from '../services/auth';
 import { ThemeContext } from '../context/ThemeContext';
 
-interface AsetuksetScreenProps {
+interface OhjeetScreenProps {
   user: User | null;
   onLogout: () => void;
 }
 
-export const AsetuksetScreen: React.FC<AsetuksetScreenProps> = ({ user, onLogout }) => {
+export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [notifications, setNotifications] = React.useState(true);
   const [analytics, setAnalytics] = React.useState(false);
@@ -169,14 +169,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 40,
-    textAlign: 'center',
-  },
-  subtitleDark: {
-    color: '#CCCCCC',
+  settingLabelDark: {
+    color: '#FFFFFF',
   },
   subtitle: {
     fontSize: 16,
@@ -187,6 +181,7 @@ const styles = StyleSheet.create({
   subtitleDark: {
     color: '#CCCCCC',
   },
+
   logoutButton: {
     backgroundColor: '#FF3B30',
     padding: 16,

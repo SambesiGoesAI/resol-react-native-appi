@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 import { AlpoScreen } from '../screens/AlpoScreen';
 import { UutisetScreen } from '../screens/UutisetScreen';
-import { AsetuksetScreen } from '../screens/OhjeetScreen';
+import { OhjeetScreen } from '../screens/OhjeetScreen';
+import { WebViewScreen } from '../screens/WebViewScreen';
 import { ThemeContext } from '../context/ThemeContext';
 import { User } from '../services/auth';
 
@@ -27,8 +29,12 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Uutiset') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
-          } else if (route.name === 'Asetukset') {
-            iconName = focused ? 'settings' : 'settings-outline';
+          } else if (route.name === 'Ohjeet') {
+            iconName = focused ? 'help-circle' : 'help-circle-outline';
+          } else if (route.name === 'Ohjeet') {
+            iconName = focused ? 'help-circle' : 'help-circle-outline';
+          } else if (route.name === 'Web') {
+            iconName = focused ? 'globe' : 'globe-outline';
           } else {
             iconName = 'help-outline';
           }
@@ -51,8 +57,13 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
       </Tab.Screen>
       <Tab.Screen name="Uutiset" component={UutisetScreen} />
       <Tab.Screen name="Ohjeet">
-        {() => <AsetuksetScreen user={user} onLogout={onLogout} />}
+        {() => <OhjeetScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
+      {Platform.OS !== 'web' && (
+        <Tab.Screen name="Web">
+          {() => <WebViewScreen uri="https://www.google.com" />}
+        </Tab.Screen>
+      )}
     </Tab.Navigator>
   );
 };
