@@ -55,8 +55,17 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, styles.titleCentered, isDarkMode ? styles.titleDark : null]}>Tervetuloa Alpo-sovellukseen!</Text>
-        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Syötä pääsykoodisi ja paina 'Kirjaudu'</Text>
+        <Text style={[styles.title, styles.titleCentered, isDarkMode ? styles.titleDark : null]}>Tervetuloa Resol-sovellukseen!</Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>
+          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.
+
+Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
+        
+Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).
+
+Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
+        </Text>
+        <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
         
         <TextInput
           style={[styles.input, isDarkMode ? styles.inputDark : null]}
