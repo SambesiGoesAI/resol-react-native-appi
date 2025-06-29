@@ -54,6 +54,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           blurOnSubmit={false}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           className="chat-input-no-outline"
         />
         <TouchableOpacity
