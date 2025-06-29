@@ -61,9 +61,13 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
 
 Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
         
-Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme 030 450 4850 (avoinna: 08:00 - 17:00).
+Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:
+030 450 4850 (avoinna: 08:00 - 17:00).
 
-Päivystäjämme tavoitat 24h numerosta 044 796 7982.`}
+Päivystäjämme tavoitat 24h numerosta:
+044 796 7982.
+
+Voit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
         </Text>
         <Text style={[styles.subtitle, isDarkMode ? styles.subtitleDark : null]}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
         
