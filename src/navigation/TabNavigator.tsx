@@ -59,11 +59,9 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
       <Tab.Screen name="Ohjeet">
         {() => <OhjeetScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
-      {Platform.OS !== 'web' && (
-        <Tab.Screen name="Web">
-          {() => <WebViewScreen uri="https://www.google.com" />}
-        </Tab.Screen>
-      )}
+      <Tab.Screen name="Web">
+        {() => <WebViewScreen uri="https://www.huoltokanava.fi/embed/notice/resol-oy" />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };
