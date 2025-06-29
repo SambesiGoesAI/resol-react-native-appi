@@ -1,18 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, forwardRef } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
 import './ChatInputFocusOverride.css';
+
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({
+export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
   onSendMessage,
   isLoading,
   disabled = false
-}) => {
+}, ref) => {
   const { isDarkMode } = useContext(ThemeContext);
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -61,6 +62,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             }
           }}
           className="chat-input-no-outline"
+          ref={ref}
         />
         <TouchableOpacity
           style={[
@@ -91,7 +93,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

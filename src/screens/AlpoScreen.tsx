@@ -1,5 +1,6 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, TextInput } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { User } from '../services/auth';
 import { ChatContainer } from '../components/ChatContainer';
@@ -13,12 +14,20 @@ interface AlpoScreenProps {
 
 export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   const { isDarkMode } = useContext(ThemeContext);
+  const isFocused = useIsFocused();
+  const inputRef = useRef<TextInput>(null);
   
   const [chatState, setChatState] = useState<Omit<ChatState, 'sessionID'>>({
     messages: [],
     isLoading: false,
     error: null,
   });
+
+  useEffect(() => {
+    if (isFocused) {
+      inputRef.current?.focus();
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -135,6 +144,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
         onRetry={handleRetry}
       />
       <ChatInput
+        ref={inputRef}
         onSendMessage={handleSendMessage}
         isLoading={chatState.isLoading}
       />

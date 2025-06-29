@@ -3,6 +3,14 @@ import { supabase } from './supabase';
 import { WebhookRequest, WebhookResponse, ChatMessage, ChatSession } from '../types/chat';
 import { User } from './auth';
 
+// Function to generate a v4 UUID
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const WEBHOOK_URL = 'https://n8n.andsome.fi/webhook/c389f93f-25da-42d1-929a-17046d85c5ad';
 
 export class ChatService {
@@ -70,11 +78,13 @@ export class ChatService {
         .eq('is_active', true);
 
       // Create a new session
+      const newWebhookSessionId = uuidv4();
       const { data, error } = await supabase
         .from('chat_sessions')
         .insert({
           user_id: this.currentUser.id,
           is_active: true,
+          webhook_session_id: newWebhookSessionId,
         })
         .select()
         .single();
@@ -129,103 +139,17 @@ export class ChatService {
   }
 
   /**
-   * Get or create user-specific session
-   */
-  async getOrCreateSession(): Promise<string | null> {
-    if (!this.currentUser || !supabase) {
-      return null;
-    }
-
-    try {
-      // Try to get existing active session
-      const { data: existingSessions, error: fetchError } = await supabase
-        .from('chat_sessions')
-        .select('*')
-        .eq('user_id', this.currentUser.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (fetchError) {
-        console.error('Failed to fetch existing sessions:', fetchError);
-        return null;
-      }
-
-      if (existingSessions && existingSessions.length > 0) {
-        this.currentSession = {
-          id: existingSessions[0].id,
-          userId: existingSessions[0].user_id,
-          webhookSessionId: existingSessions[0].webhook_session_id,
-          createdAt: new Date(existingSessions[0].created_at),
-          updatedAt: new Date(existingSessions[0].updated_at),
-          isActive: existingSessions[0].is_active
-        };
-        return existingSessions[0].webhook_session_id;
-      }
-
-      return null; // No existing session, will be created after first message
-    } catch (error) {
-      console.error('Failed to get or create session:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Save session to Supabase after receiving from webhook
-   */
-  async saveSession(webhookSessionId: string): Promise<void> {
-    if (!this.currentUser || !supabase) {
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('chat_sessions')
-        .insert({
-          user_id: this.currentUser.id,
-          webhook_session_id: webhookSessionId,
-          is_active: true
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Failed to save session to Supabase:', error);
-        return;
-      }
-
-      this.currentSession = {
-        id: data.id,
-        userId: data.user_id,
-        webhookSessionId: data.webhook_session_id,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
-        isActive: data.is_active
-      };
-    } catch (error) {
-      console.error('Failed to save session:', error);
-    }
-  }
-
-  /**
    * Send message with user context
    */
   async sendMessage(message: string): Promise<WebhookResponse> {
-    if (!this.currentUser) {
-      throw new Error('No user context available');
+    if (!this.currentUser || !this.currentSession) {
+      throw new Error('No user or active session context available');
     }
-
-    // Get existing session ID
-    const existingSessionId = await this.getOrCreateSession();
 
     const requestBody: WebhookRequest = {
       message: message.trim(),
+      sessionId: this.currentSession.webhookSessionId,
     };
-
-    // Include sessionId if we have one
-    if (existingSessionId) {
-      requestBody.sessionId = existingSessionId;
-    }
 
     try {
       const response = await fetch(WEBHOOK_URL, {
@@ -242,10 +166,7 @@ export class ChatService {
 
       const data = await response.json();
 
-      // Save session ID if this is the first message
-      if (!existingSessionId && data.sessionId) {
-        await this.saveSession(data.sessionId);
-      }
+      
 
       return data;
     } catch (error) {
@@ -269,33 +190,7 @@ export class ChatService {
     // Note: We don't delete data from Supabase, just clear local references
   }
 
-  /**
-   * Clear all chat data for current user (destructive operation)
-   */
-  async clearUserChatHistory(): Promise<void> {
-    if (!this.currentUser || !supabase) {
-      return;
-    }
-
-    try {
-      // Delete messages first (due to foreign key constraints)
-      await supabase
-        .from('chat_messages')
-        .delete()
-        .eq('user_id', this.currentUser.id);
-
-      // Delete sessions
-      await supabase
-        .from('chat_sessions')
-        .delete()
-        .eq('user_id', this.currentUser.id);
-
-      this.currentSession = null;
-    } catch (error) {
-      console.error('Failed to clear user chat history:', error);
-      throw error;
-    }
-  }
+  
 }
 
 export const chatService = new ChatService();
