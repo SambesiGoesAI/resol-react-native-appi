@@ -45,7 +45,6 @@ export class ChatService {
         .order('timestamp', { ascending: true });
 
       if (error) {
-        console.error('Failed to load messages from Supabase:', error);
         return [];
       }
 
@@ -56,7 +55,6 @@ export class ChatService {
         timestamp: new Date(msg.timestamp),
       }));
     } catch (error) {
-      console.error('Failed to load messages:', error);
       return [];
     }
   }
@@ -90,7 +88,6 @@ export class ChatService {
         .single();
 
       if (error) {
-        console.error('Failed to create a new session:', error);
         this.currentSession = null;
         return;
       }
@@ -104,7 +101,6 @@ export class ChatService {
         isActive: data.is_active,
       };
     } catch (error) {
-      console.error('Failed to start a new session:', error);
       this.currentSession = null;
     }
   }
@@ -114,7 +110,6 @@ export class ChatService {
    */
   async saveMessage(message: ChatMessage): Promise<void> {
     if (!this.currentUser || !supabase) {
-      console.warn('Cannot save message: no user context or Supabase connection');
       return;
     }
 
@@ -131,10 +126,8 @@ export class ChatService {
         });
 
       if (error) {
-        console.error('Failed to save message to Supabase:', error);
       }
     } catch (error) {
-      console.error('Failed to save message:', error);
     }
   }
 
@@ -174,21 +167,9 @@ export class ChatService {
     }
   }
 
-  /**
-   * Get current session ID
-   */
-  getSessionID(): string | null {
-    return this.currentSession?.webhookSessionId || null;
-  }
+  
 
-  /**
-   * Clear user-specific data on logout
-   */
-  async clearUserData(): Promise<void> {
-    this.currentUser = null;
-    this.currentSession = null;
-    // Note: We don't delete data from Supabase, just clear local references
-  }
+  
 
   
 }

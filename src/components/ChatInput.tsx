@@ -17,12 +17,14 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
   const { isDarkMode } = useContext(ThemeContext);
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [inputKey, setInputKey] = useState(0); // State to force TextInput re-mount
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
     if (trimmedMessage && !isLoading && !disabled) {
       onSendMessage(trimmedMessage);
-      setMessage('');
+      setMessage(''); // Clear the React state
+      setInputKey(prevKey => prevKey + 1); // Force TextInput re-mount
     }
   };
 
@@ -36,9 +38,10 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
       <View style={[
         styles.inputContainer,
         isDarkMode ? styles.inputContainerDark : null,
-        isFocused ? styles.inputContainerFocused : null
+        (isFocused && !isLoading) ? styles.inputContainerFocused : null
       ]}>
         <TextInput
+          key={inputKey}
           style={[
             styles.textInput,
             isDarkMode ? styles.textInputDark : null,
@@ -51,8 +54,6 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
           multiline
           maxLength={1000}
           editable={!isLoading && !disabled}
-          onSubmitEditing={handleSend}
-          blurOnSubmit={false}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onKeyPress={(e) => {

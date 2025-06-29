@@ -24,34 +24,32 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   });
 
   useEffect(() => {
-    if (isFocused) {
-      inputRef.current?.focus();
+    if (isFocused && inputRef.current) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100); // Small delay to ensure UI is ready
+      return () => clearTimeout(timer);
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    if (!chatState.isLoading && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0); // Ensure focus after loading completes
+    }
+  }, [chatState.isLoading]);
 
   useEffect(() => {
     const initializeChat = async () => {
       if (user) {
         await chatService.setUser(user);
-        loadChatHistory();
       }
     };
     initializeChat();
   }, [user]);
 
-  const loadChatHistory = async () => {
-    try {
-      const messages = await chatService.loadMessages();
-      const sessionID = chatService.getSessionID();
-      setChatState(prev => ({
-        ...prev,
-        messages,
-        sessionID,
-      }));
-    } catch (error) {
-      console.error('Failed to load chat history:', error);
-    }
-  };
+  
 
   const generateMessageId = (): string => {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
