@@ -57,36 +57,38 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
       <View style={styles.content}>
         <Text style={[styles.title, styles.titleCentered]}>Tervetuloa Resol Appiin!</Text>
         <Text style={styles.subtitle}>
-          {`Tässä sovelluksessa voit mm. keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa ja lähettää meille huoltopyyntöjä.\n\nHuomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n        \nJos olet pikaisen avun tarpeessa pyydämme olemaan yhteydessä asiakaspalveluumme:\n030 450 4850\n(avoinna: 08:00 - 17:00).\n\nPäivystäjämme tavoitat 24h numerosta:\n044 796 7982.\n\nVoit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
+          {`Tässä sovelluksessa voit mm. keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa ja lähettää meille huoltopyyntöjä.\n\nUloskirjautuminen löytyy 'Ohjeet' -välilehdeltä.`}
         </Text>
-        <Text style={styles.subtitle}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
+       
         
-        <TextInput
-          style={styles.input}
-          placeholder="Pääsykoodi"
-          placeholderTextColor={Colors.loginPlaceholder}
-          value={accessCode}
-          onChangeText={setAccessCode}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          onSubmitEditing={handleLogin}
-          returnKeyType="done"
-          ref={inputRef}
-        />
-        
-        <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={Colors.white} />
-          ) : (
-            <Text style={styles.buttonText}>Kirjaudu</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Pääsykoodi"
+            placeholderTextColor={Colors.loginPlaceholder}
+            value={accessCode}
+            onChangeText={setAccessCode}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+            onSubmitEditing={handleLogin}
+            returnKeyType="done"
+            ref={inputRef}
+          />
+          
+          <TouchableOpacity 
+            style={[styles.button, isLoading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={Colors.white} />
+            ) : (
+              <Text style={styles.buttonText}>Kirjaudu</Text>
+            )}
+          </TouchableOpacity>
+        </View>
         <Image
           source={require('../../assets/resol-logo.png')}
           style={styles.logo}
@@ -108,10 +110,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
     color: Colors.loginText,
     marginBottom: 10,
+    marginTop: 60,
   },
   subtitle: {
     fontSize: 16,
@@ -120,24 +123,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    width: '100%',
-    height: 50,
+    flex: 1,
+    height: 40,
     backgroundColor: Colors.white,
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
     borderWidth: 1,
     borderColor: Colors.lightGray,
-    marginBottom: 20,
+    marginRight: 10,
     color: Colors.loginInputText,
   },
   button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: Colors.loginButton,
+    height: 40,
+    backgroundColor: Colors.ohjeetButtonBackground,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -153,7 +162,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 100,
-    marginTop: 50,
+    marginTop: 20,
     resizeMode: 'contain',
   },
 });

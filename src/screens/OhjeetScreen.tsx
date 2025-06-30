@@ -75,8 +75,8 @@ export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) =>
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: Colors.lightGray, true: Colors.primary }}
-                thumbColor={notifications ? Colors.white : Colors.lightGray}
+                trackColor={{ false: Colors.lightGray, true: Colors.toggleTrackOn }}
+                thumbColor={notifications ? Colors.white : Colors.darkGray}
               />
             </View>
           </View>

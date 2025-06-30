@@ -35,4 +35,5 @@ export const Colors = {
   ohjeetText: '#141B4F',
   settingsSectionBackground: '#333861',
   settingsSectionText: '#F4C378',
+  toggleTrackOn: '#CA7191',
 };

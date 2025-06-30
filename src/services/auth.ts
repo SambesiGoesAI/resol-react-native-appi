@@ -25,7 +25,7 @@ export const authService = {
         .single();
 
       if (userError || !userData) {
-        return { user: null, error: 'Invalid access code' };
+        return { user: null, error: 'Tarkista pääsykoodi' };
       }
 
       // Then, query the user_housing_companies table separately
