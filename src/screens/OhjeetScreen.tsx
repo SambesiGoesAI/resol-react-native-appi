@@ -59,58 +59,55 @@ export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) =>
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        
-        <Text style={styles.subtitle}>
-          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.
-
-Huomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.
-        
-Jos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:
-030 450 4850 (avoinna: 08:00 - 17:00).
-
-Päivystäjämme tavoitat 24h numerosta:
-044 796 7982.`}
-        </Text>
-        
-        
-
-        <View style={styles.section}>
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Ilmoitukset</Text>
-            <Switch
-              value={notifications}
-              onValueChange={setNotifications}
-              trackColor={{ false: Colors.lightGray, true: Colors.primary }}
-              thumbColor={notifications ? Colors.white : Colors.lightGray}
-            />
-          </View>
+  return(
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.textContainer}>
+          <Text style={styles.subtitle}>
+            {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.\n\nHuomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n        \nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:\n030 450 4850 (avoinna: 08:00 - 17:00).\n\nPäivystäjämme tavoitat 24h numerosta:\n044 796 7982.`}
+          </Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
-          <Text style={styles.logoutButtonText}>Kirjaudu ulos</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View>
+          <View style={styles.section}>
+            <View style={styles.settingRow}>
+              <Text style={styles.settingLabel}>Ilmoitukset</Text>
+              <Switch
+                value={notifications}
+                onValueChange={setNotifications}
+                trackColor={{ false: Colors.lightGray, true: Colors.primary }}
+                thumbColor={notifications ? Colors.white : Colors.lightGray}
+              />
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutButtonText}>Kirjaudu ulos</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.ohjeetBackground,
   },
-  content: {
+  scrollContent: {
+    flexGrow: 1,
     padding: 20,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
   
   section: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.settingsSectionBackground,
     padding: 20,
     borderRadius: 12,
     marginBottom: 20,
@@ -128,22 +125,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGray,
+    borderBottomWidth: 0,
   },
   settingLabel: {
     fontSize: 16,
-    color: Colors.text,
+    color: Colors.settingsSectionText,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.mediumGray,
-    marginBottom: 40,
+    color: Colors.ohjeetText,
     textAlign: 'center',
   },
 
   logoutButton: {
-    backgroundColor: Colors.error,
+    backgroundColor: Colors.ohjeetButtonBackground,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

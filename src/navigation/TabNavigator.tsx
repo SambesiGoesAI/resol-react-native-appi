@@ -48,6 +48,7 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerTitleAlign: 'center',
       })}
     >
       <Tab.Screen name="Alpo">

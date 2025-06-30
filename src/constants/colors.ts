@@ -30,4 +30,9 @@ export const Colors = {
   uutisetBackground: '#141B4F',
   newsCardBackground: '#F4C378',
   newsCardText: '#141B4F',
+  ohjeetButtonBackground: '#CA7191',
+  ohjeetBackground: '#F4C378',
+  ohjeetText: '#141B4F',
+  settingsSectionBackground: '#333861',
+  settingsSectionText: '#F4C378',
 };
