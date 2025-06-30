@@ -39,16 +39,22 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.gray,
+        tabBarActiveTintColor: Colors.loginText,
+        tabBarInactiveTintColor: Colors.loginText,
         headerStyle: {
           backgroundColor: Colors.headerBackground,
+          marginBottom: 20,
         },
         headerTintColor: Colors.white,
         headerTitleStyle: {
           fontWeight: 'bold',
+          paddingBottom: 10,
         },
         headerTitleAlign: 'center',
+        tabBarStyle: {
+          backgroundColor: Colors.headerBackground,
+          paddingTop: 10,
+        },
       })}
     >
       <Tab.Screen name="Alpo">
