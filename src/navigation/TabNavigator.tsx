@@ -43,7 +43,6 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         tabBarInactiveTintColor: Colors.loginText,
         headerStyle: {
           backgroundColor: Colors.headerBackground,
-          marginBottom: 20,
         },
         headerTintColor: Colors.white,
         headerTitleStyle: {
