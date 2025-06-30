@@ -27,4 +27,7 @@ export const Colors = {
   dot: '#999999',
   border: '#E5E5EA',
   textSecondary: '#666666',
+  uutisetBackground: '#141B4F',
+  newsCardBackground: '#F4C378',
+  newsCardText: '#141B4F',
 };

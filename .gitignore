@@ -50,3 +50,6 @@ coverage/
 # Misc
 *.log
 _screenshots/
+
+# Ignore instruction files
+_instructions/

@@ -6,8 +6,6 @@ interface NewsCardProps {
   news: NewsItem;
 }
 
-const MAX_LINES_COLLAPSED = 3;
-
 // Static mapping of image paths to require calls
 const imageMap: { [key: string]: any } = {
   'icon.png': require('../../assets/icon.png'),
@@ -32,82 +30,68 @@ export const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
 
   return (
     <View style={styles.card}>
-      <View style={styles.content}>
-        <Text style={styles.title}>{news.title}</Text>
-        <View>
-          <Text
-            style={styles.text}
-            accessibilityLabel={news.text}
-          >
-            {news.text}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.thumbnailContainer}>
+      <View style={styles.centeredContent}>
         {imageSource ? (
           <Image
             source={imageSource}
             style={styles.thumbnail}
             onError={() => setImageError(true)}
+            resizeMode="contain"
           />
         ) : (
-          <View style={styles.placeholder}>
+          <View style={[styles.thumbnail, styles.placeholder]}>
             <Text style={styles.placeholderText}>Alpo tiedottaa</Text>
           </View>
         )}
+        <Text style={styles.title}>{news.title}</Text>
+        <Text
+          style={styles.text}
+          accessibilityLabel={news.text}
+        >
+          {news.text}
+        </Text>
       </View>
     </View>
   );
 };
 
+import { Colors } from '../constants/colors';
+
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: Colors.newsCardBackground,
     borderRadius: 8,
-    padding: 12,
+    paddingVertical: 20,
     marginVertical: 20,
     marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    alignItems: 'center',
   },
-  content: {
-    flex: 1,
-    paddingRight: 12,
-    justifyContent: 'center',
+  centeredContent: {
+    width: '80%',
   },
   title: {
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 6,
+    marginTop: 12,
   },
   text: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#333',
-  },
-  toggleText: {
-    marginTop: 4,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  thumbnailContainer: {
-    width: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    color: Colors.newsCardText,
   },
   thumbnail: {
-    width: 80,
-    height: 80,
+    width: '100%',
+    height: 200,
     borderRadius: 6,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
   },
   placeholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 6,
     backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
