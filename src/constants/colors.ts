@@ -23,4 +23,8 @@ export const Colors = {
   headerBackground: '#141B4F',
   chatSendButtonBackground: '#CA7191',
   chatSendButtonText: '#F4C378',
+  bubbleBackground: '#E5E5EA',
+  dot: '#999999',
+  border: '#E5E5EA',
+  textSecondary: '#666666',
 };

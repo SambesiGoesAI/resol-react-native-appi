@@ -9,10 +9,18 @@ interface ChatInputProps {
   disabled?: boolean;
 }
 
+interface ChatInputProps {
+  onSendMessage: (message: string) => void;
+  isLoading: boolean;
+  disabled?: boolean;
+  sendButtonTextColor?: string; // New optional prop for button text color
+}
+
 export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
   onSendMessage,
   isLoading,
-  disabled = false
+  disabled = false,
+  sendButtonTextColor, // Destructure new prop
 }, ref) => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -80,7 +88,7 @@ export const ChatInput = forwardRef<TextInput, ChatInputProps>(({
             <Text style={[
               styles.sendButtonText,
               showActiveStyle
-                ? styles.sendButtonTextActive
+                ? [styles.sendButtonTextActive, sendButtonTextColor ? { color: sendButtonTextColor } : {}]
                 : styles.sendButtonTextInactive
             ]}>
               Lähetä

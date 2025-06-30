@@ -73,7 +73,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 baseStyle={StyleSheet.flatten(baseTextStyle) || {}}
                 tagsStyles={{
                   a: { textDecorationLine: 'underline', color: Colors.primary },
-                  b: { fontWeight: 'bold', color: Colors.agentText },
+                  b: { fontWeight: 'bold', color: Colors.chatAgentText },
                   i: baseTextStyle || {},
                   u: baseTextStyle || {},
                   em: baseTextStyle || {},

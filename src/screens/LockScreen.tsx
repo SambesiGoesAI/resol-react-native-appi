@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { authService, User } from '../services/auth';
 import { Colors } from '../constants/colors';
@@ -54,9 +55,9 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, styles.titleCentered]}>Tervetuloa Resol-sovellukseen!</Text>
+        <Text style={[styles.title, styles.titleCentered]}>Tervetuloa Resol Appiin!</Text>
         <Text style={styles.subtitle}>
-          {`Tässä sovelluksessa voit keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa.\n\nHuomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n        \nJos olet pikaisen avun tarpeessa olethan yhteydessä asiakaspalveluumme:\n030 450 4850 (avoinna: 08:00 - 17:00).\n\nPäivystäjämme tavoitat 24h numerosta:\n044 796 7982.\n\nVoit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
+          {`Tässä sovelluksessa voit mm. keskustella Resol Oy:n virtuaalisen talonmiehen Alpon kanssa ja lähettää meille huoltopyyntöjä.\n\nHuomioithan, että Alpo ei ole oikea henkilö, vaan tekoälyavustaja: se ei voi antaa oikeudellista tai lääketieteellistä neuvontaa.\n        \nJos olet pikaisen avun tarpeessa pyydämme olemaan yhteydessä asiakaspalveluumme:\n030 450 4850\n(avoinna: 08:00 - 17:00).\n\nPäivystäjämme tavoitat 24h numerosta:\n044 796 7982.\n\nVoit halutessasi kirjautua ulos sovelluksesta 'Ohjeet' -välilehdeltä.`}
         </Text>
         <Text style={styles.subtitle}>Syötä pääsykoodisi alle ja paina 'Kirjaudu'</Text>
         
@@ -86,6 +87,10 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onLoginSuccess }) => {
             <Text style={styles.buttonText}>Kirjaudu</Text>
           )}
         </TouchableOpacity>
+        <Image
+          source={require('../../assets/resol-logo.png')}
+          style={styles.logo}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -144,5 +149,11 @@ const styles = StyleSheet.create({
   },
   titleCentered: {
     textAlign: 'center',
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginTop: 50,
+    resizeMode: 'contain',
   },
 });

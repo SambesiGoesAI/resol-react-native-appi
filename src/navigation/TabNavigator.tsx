@@ -21,6 +21,7 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        keyboardHidesTabBar: true,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
@@ -53,7 +54,13 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         {() => <AlpoScreen user={user} />}
       </Tab.Screen>
       <Tab.Screen name="Uutiset" component={UutisetScreen} />
-      <Tab.Screen name="Huoltopyyntö">
+      <Tab.Screen
+        name="Huoltopyyntö"
+        options={{
+          tabBarLabel: 'Huoltopyyntö',
+          headerTitle: 'Lähetä meille huoltopyyntösi tästä!',
+        }}
+      >
         {() => <WebViewScreen uri="https://www.huoltokanava.fi/embed/notice/resol-oy" />}
       </Tab.Screen>
       <Tab.Screen name="Ohjeet">

@@ -144,6 +144,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
         ref={inputRef}
         onSendMessage={handleSendMessage}
         isLoading={chatState.isLoading}
+        sendButtonTextColor="#FFFFFF"
       />
     </KeyboardAvoidingView>
   );
