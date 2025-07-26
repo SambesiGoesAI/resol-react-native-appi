@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, TextInput } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, TextInput, Keyboard, TouchableOpacity } from 'react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { User } from '../services/auth';
 import { ChatContainer } from '../components/ChatContainer';
 import { ChatInput } from '../components/ChatInput';
@@ -15,6 +16,9 @@ interface AlpoScreenProps {
 export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   const isFocused = useIsFocused();
   const inputRef = useRef<TextInput>(null);
+
+  const navigation = useNavigation<any>();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   
   const [chatState, setChatState] = useState<Omit<ChatState, 'sessionID'>>({
     messages: [],
@@ -40,13 +44,33 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   }, [chatState.isLoading]);
 
   useEffect(() => {
-    const initializeChat = async () => {
-      if (user) {
-        await chatService.setUser(user);
-      }
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
     };
-    initializeChat();
-  }, [user]);
+  }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: keyboardVisible ? () => (
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={handleBackPress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      ) : undefined,
+    });
+  }, [navigation, keyboardVisible]);
 
   
 
@@ -115,6 +139,11 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
     }
   }, [chatState.isLoading]);
 
+  const handleBackPress = () => {
+    // Use Keyboard from react-native to dismiss keyboard
+    Keyboard.dismiss();
+  };
+
   const handleRetry = useCallback(() => {
     setChatState(prev => ({ ...prev, error: null }));
     // Get the last user message and resend it
@@ -154,5 +183,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  backButton: {
+    paddingLeft: 16,
+    paddingRight: 8,
+    paddingVertical: 8,
   },
 });
