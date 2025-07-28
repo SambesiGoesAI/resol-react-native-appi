@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.samiviitanen.AlpoApp",
+      "bundleIdentifier": "fi.resol.resolappi",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -33,6 +33,7 @@
       "eas": {
         "projectId": "dd7bf0e5-3545-48c3-ab79-9bcc66959ce1"
       }
-    }
+    },
+    "owner": "sami-resol"
   }
 }

@@ -23,7 +23,6 @@
     "production": {
       "ios": {
         "appleId": "sami.viitanen@resol.fi",
-        "ascAppId": "6748963588",
         "appleTeamId": "FFJS2WA9RD"
       }
     }
