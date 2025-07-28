@@ -36,6 +36,19 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
   }, [isFocused]);
 
   useEffect(() => {
+    async function setUserContext() {
+      try {
+        if (user) {
+          await chatService.setUser(user);
+        }
+      } catch (error) {
+        console.error('Failed to set user in chatService:', error);
+      }
+    }
+    setUserContext();
+  }, [user]);
+
+  useEffect(() => {
     if (!chatState.isLoading && inputRef.current) {
       setTimeout(() => {
         inputRef.current?.focus();
