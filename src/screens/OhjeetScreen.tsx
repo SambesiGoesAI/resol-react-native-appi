@@ -9,7 +9,7 @@ interface OhjeetScreenProps {
 }
 
 export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) => {
-  const [notifications, setNotifications] = React.useState(true);
+  // const [notifications, setNotifications] = React.useState(true);
   const [analytics, setAnalytics] = React.useState(false);
 
   const handleLogout = async () => {
@@ -69,6 +69,7 @@ export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) =>
         </View>
 
         <View>
+          {/* Temporarily removed Ilmoitukset section
           <View style={styles.section}>
             <View style={styles.settingRow}>
               <Text style={styles.settingLabel}>Ilmoitukset</Text>
@@ -80,6 +81,7 @@ export const OhjeetScreen: React.FC<OhjeetScreenProps> = ({ user, onLogout }) =>
               />
             </View>
           </View>
+          */}
           <TouchableOpacity
             style={styles.logoutButton}
             onPress={handleLogout}
