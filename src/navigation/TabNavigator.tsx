@@ -26,13 +26,13 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
           let iconName: keyof typeof Ionicons.glyphMap;
 
           if (route.name === 'Alpo') {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'person-circle' : 'person-circle-outline';
           } else if (route.name === 'Uutiset') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === 'Huoltopyyntö') {
             iconName = focused ? 'clipboard' : 'clipboard-outline';
-          } else if (route.name === 'Ohjeet') {
-            iconName = focused ? 'help-circle' : 'help-circle-outline';
+          } else if (route.name === 'Koti') {
+            iconName = focused ? 'home' : 'home-outline';
           } else {
             iconName = 'help-outline';
           }
@@ -56,6 +56,9 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         },
       })}
     >
+      <Tab.Screen name="Koti">
+        {() => <OhjeetScreen user={user} onLogout={onLogout} />}
+      </Tab.Screen>
       <Tab.Screen name="Alpo">
         {() => <AlpoScreen user={user} />}
       </Tab.Screen>
@@ -68,9 +71,6 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({ user, onLogout }) =>
         }}
       >
         {() => <WebViewScreen uri="https://www.huoltokanava.fi/embed/notice/resol-oy" />}
-      </Tab.Screen>
-      <Tab.Screen name="Ohjeet">
-        {() => <OhjeetScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
