@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.resol.resolappi"
+      "bundleIdentifier": "fi.resol.resolappi",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dd7bf0e5-3545-48c3-ab79-9bcc66959ce1"
+      }
+    },
+    "owner": "sami-resol"
   }
 }

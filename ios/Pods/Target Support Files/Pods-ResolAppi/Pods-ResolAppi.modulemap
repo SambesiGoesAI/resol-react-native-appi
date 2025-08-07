@@ -1,0 +1,6 @@
+module Pods_ResolAppi {
+  umbrella header "Pods-ResolAppi-umbrella.h"
+
+  export *
+  module * { export * }
+}
