@@ -181,6 +181,7 @@ export const AlpoScreen: React.FC<AlpoScreenProps> = ({ user }) => {
         isLoading={chatState.isLoading}
         error={chatState.error}
         onRetry={handleRetry}
+        keyboardVisible={keyboardVisible}
       />
       <ChatInput
         ref={inputRef}

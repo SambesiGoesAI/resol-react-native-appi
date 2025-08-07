@@ -9,6 +9,7 @@ interface ChatContainerProps {
   isLoading: boolean;
   error: string | null;
   onRetry?: () => void;
+  keyboardVisible?: boolean;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
@@ -16,6 +17,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   isLoading,
   error,
   onRetry,
+  keyboardVisible,
 }) => {
   const flatListRef = useRef<FlatList>(null);
 
@@ -60,6 +62,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       }, 100);
     }
   }, [messages.length]);
+
+  useEffect(() => {
+    if (keyboardVisible && uniqueMessages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [keyboardVisible, uniqueMessages.length]);
 
   const renderMessage = ({ item }: { item: ChatMessageType }) => (
     <ChatMessage key={item.id} message={item} />
