@@ -57,3 +57,9 @@ git-sim_media/
 android/.gradle/
 android/build/
 android/local.properties
+
+# Ignore backup files (contain sensitive data)
+backups/*.sql
+
+# Ignore SQL backup files
+backups/*.sql
